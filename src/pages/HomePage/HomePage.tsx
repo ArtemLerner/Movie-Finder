@@ -1,19 +1,14 @@
-import {Movie} from "../../api/movie.ts";
-import {useEffect, useState} from "react";
-import MovieCart from "../../components/MovieCart/MovieCart.tsx";
-
+import TrendingSection from "../../components/TrendingSection/TrendingSection.tsx";
 
 export default function HomePage() {
-    const [movies, setMovies] = useState([]);
 
-    useEffect(() => {
-        Movie().then(movies => setMovies(movies));
-    }, []);
+
+
 
     return (
-
-        <div className="movie-list">
-            {movies.map(movie => <MovieCart data={movie}/>)}
+        <div>
+            <TrendingSection  mediaType='movie'/>
+            <TrendingSection  mediaType='tv'/>
         </div>
     )
 }
