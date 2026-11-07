@@ -5,7 +5,6 @@ import MovieCart from "../../components/MovieCart/MovieCart.tsx";
 import MovieSwitchers from "../../components/MovieSwitchers/MovieSwitchers.tsx";
 import type {MovieCartType} from "../../share/types/MovieCart.ts";
 
-
 interface Props {
     mediaType: MediaType;
 }

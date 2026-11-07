@@ -1,7 +1,7 @@
-export type MovieCart = {
+export type MovieCartType = {
     id: number;
-    title: string;
+    title?: string;
+    name?: string;
     poster_path: string;
 }
 
-export type MovieCartType = typeof MovieCart

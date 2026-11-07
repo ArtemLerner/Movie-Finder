@@ -1,7 +1,7 @@
-import type {MovieCart} from "../../share/types/MovieCart.ts";
+import type {MovieCartType} from "../../share/types/MovieCart.ts";
 
 type PropsMovie = {
-    data: MovieCart;
+    data: MovieCartType;
 }
 const IMG = 'https://image.tmdb.org/t/p/w500';
 

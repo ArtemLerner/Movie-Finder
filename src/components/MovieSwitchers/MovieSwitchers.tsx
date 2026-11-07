@@ -13,7 +13,7 @@ export default function MovieSwitchers({buttons, time}: propsSwithers){
                 button =>
                     <button key={button}
                         onClick={()=>{
-                            time(button) ;
+                            time(button as timeWindow) ;
                         }}>
                         {button}
                     </button>
