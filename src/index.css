@@ -29,9 +29,7 @@ body {
 
 /* ---------- Секция ---------- */
 
-.trending {
-    padding-top: 28px;
-}
+
 
 .trending__header {
     display: flex;
@@ -216,15 +214,18 @@ body {
         transform: none;
     }
 }
-
+.search{
+    padding: 30px!important;
+}
+#root{
+    padding: 30px;
+}
 @media (min-width: 768px) {
     :root {
         --gutter: 40px;
     }
 
-    .trending {
-        padding-top: 40px;
-    }
+
 
     .trending__header h2,
     .trending h2 {
@@ -255,4 +256,203 @@ body {
     .buttons button {
         transition: none;
     }
+}
+/* ===== Добавьте в конец вашего CSS ===== */
+
+/* ---------- Страница ---------- */
+
+.page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--gutter) 64px;
+}
+
+.page__title {
+    margin: 8px 0 24px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.page__title span {
+    color: var(--accent);
+}
+
+.status {
+    margin: 32px 0;
+    text-align: center;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+/* ---------- Форма поиска ---------- */
+
+.search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px var(--gutter) 0;
+}
+
+.search__input {
+    flex: 1;
+    min-width: 0;
+    height: 48px;
+    padding: 0 20px 0 48px;
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.06);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238c8a97' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 18px center;
+    color: var(--text);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.search__input::placeholder {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.search__input:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+.search__input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background-color: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.search__button {
+    appearance: none;
+    flex-shrink: 0;
+    height: 48px;
+    padding: 0 26px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #1d0e06;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 20px var(--accent-glow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.search__button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+    box-shadow: 0 10px 28px var(--accent-glow);
+}
+
+.search__button:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.search__button:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+    .search__button {
+        padding: 0 18px;
+    }
+}
+
+/* ---------- Карточка: заглушка без постера ---------- */
+
+.movie-block__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    background:
+            linear-gradient(160deg, rgba(255, 122, 61, 0.12), transparent 60%),
+            var(--surface);
+}
+
+/* ---------- Swiper ---------- */
+
+.swiper {
+    --swiper-theme-color: var(--accent);
+    --swiper-navigation-size: 20px;
+    padding: 24px var(--gutter) 48px;
+}
+
+/* внутри слайда карточка занимает всю ширину слайда */
+.swiper-slide .movie-block {
+    width: 100%;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(10, 10, 16, 0.7);
+    border: 1px solid var(--edge);
+    backdrop-filter: blur(8px);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background: var(--accent);
+    --swiper-navigation-color: #1d0e06;
+    transform: scale(1.08);
+}
+
+.swiper-button-disabled {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ---------- Сетка результатов поиска ---------- */
+
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 16px;
+}
+
+.movies-grid .movie-block {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        gap: 24px;
+    }
+}
+
+/* ---------- Мелочи ---------- */
+
+::selection {
+    background: var(--accent);
+    color: #1d0e06;
+}
+
+img {
+    -webkit-user-drag: none;
+}
+
+html {
+    scroll-behavior: smooth;
 }

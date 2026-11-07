@@ -9,6 +9,8 @@ import {Navigation} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 
+
+
 interface Props {
     mediaType: MediaType;
 }
@@ -22,9 +24,11 @@ export default function TrendingSection({ mediaType }: Props) {
     const [movies, setMovies] = useState<MovieCartType[]>([]);
     const [timeWindow, setTimeWindow] = useState<timeWindow>('day')
 
+
     useEffect(() => {
         Movie(mediaType, timeWindow).then(movies => setMovies(movies ?? []));
     }, [mediaType, timeWindow]);
+
 
     return (
         <div className='trending'>
@@ -53,7 +57,9 @@ export default function TrendingSection({ mediaType }: Props) {
                        <MovieCart key={movie.poster_path} data={movie}/>
                    </SwiperSlide>
                 )}
+
                 </Swiper>
+
             </div>
         </div>
 

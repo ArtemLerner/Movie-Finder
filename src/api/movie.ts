@@ -20,3 +20,18 @@ export async function Movie(mediaType: MediaType, timeWindow: timeWindow){
         console.error(error);
     }
 }
+
+export async function SearchMovies(query: string){
+
+    const res = await fetch(
+        `${BASE_URL}search/multi?query=${encodeURIComponent(query)}`
+
+        , {
+            headers: { Authorization: `Bearer ${TMDB_TOKENT}` },
+        });
+
+    if (!res.ok) throw new Error("Search failed");
+    const data = await res.json();
+    return data.results;
+
+}
