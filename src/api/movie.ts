@@ -10,7 +10,7 @@ export async function Movie(mediaType: MediaType, timeWindow: timeWindow){
 
     try{
         const response = await fetch(
-            `https://api.themoviedb.org/3/trending/${mediaType}/${timeWindow}?language=en-US`, {
+            `${BASE_URL}trending/${mediaType}/${timeWindow}?language=en-US`, {
                 headers: { Authorization: `Bearer ${TMDB_TOKENT}` },
             });
         const data = await response.json();

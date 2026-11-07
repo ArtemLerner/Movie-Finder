@@ -1,9 +1,10 @@
 import type {MovieCart} from "../../share/types/MovieCart.ts";
 
 type PropsMovie = {
-    data: MovieCart[];
+    data: MovieCart;
 }
 const IMG = 'https://image.tmdb.org/t/p/w500';
+
 export default function MovieCart({data}: PropsMovie) {
     return (
         <div className="movie-block" key={data.id}>

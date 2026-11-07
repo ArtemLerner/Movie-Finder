@@ -3,3 +3,5 @@ export type MovieCart = {
     title: string;
     poster_path: string;
 }
+
+export type MovieCartType = typeof MovieCart

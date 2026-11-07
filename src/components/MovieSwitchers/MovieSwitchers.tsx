@@ -1,9 +1,9 @@
+import type {timeWindow} from "../../api/movie.ts";
 
 type propsSwithers = {
     buttons: string[]
-    time: (value: string) => void
+    time: (value: timeWindow) => void
 }
-
 
 
 export default function MovieSwitchers({buttons, time}: propsSwithers){
