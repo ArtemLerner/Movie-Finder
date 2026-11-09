@@ -1,6 +1,5 @@
-
 const TMDB_TOKENT = import.meta.env.VITE_TMDB_TOKENT;
-const BASE_URL: string = 'https://api.themoviedb.org/3/';
+const BASE_URL: string =  import.meta.env.VITE_URL ?? 'http://localhost:3000/api/';
 
 export type timeWindow = 'day' | 'week';
 export type MediaType = 'movie' | 'tv';
@@ -24,7 +23,7 @@ export async function Movie(mediaType: MediaType, timeWindow: timeWindow){
 export async function SearchMovies(query: string){
 
     const res = await fetch(
-        `${BASE_URL}search/multi?query=${encodeURIComponent(query)}`
+        `${BASE_URL}search?q=${encodeURIComponent(query)}`
 
         , {
             headers: { Authorization: `Bearer ${TMDB_TOKENT}` },

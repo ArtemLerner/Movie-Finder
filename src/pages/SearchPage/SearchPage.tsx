@@ -9,8 +9,6 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { useSearchParams } from "react-router-dom";
 
-
-
 export default function SearchPage(){
     const [results, setResults] = useState<MovieCartType[]>([]);
     const [searchParams] = useSearchParams();
@@ -24,7 +22,6 @@ export default function SearchPage(){
     return (
         <>
             <MovieFinder/>
-
             <Swiper
                 modules={[Navigation]}
                 navigation
@@ -33,8 +30,8 @@ export default function SearchPage(){
                 breakpoints={{
                     768: { slidesPerView: 4 },
                     1200: { slidesPerView: 6 },
-                }}
-            >
+                }}>
+
                 {results.map(movie =>
                     <SwiperSlide key={movie.id}>
                         <MovieCart key={movie.poster_path} data={movie}/>
