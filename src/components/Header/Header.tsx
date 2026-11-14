@@ -2,7 +2,7 @@ import MovieFinder from '../MovieFinder/MovieFinder'
 import {NavLink} from 'react-router-dom'
 
 
-const registerImg = '../../../public/log-in.svg'
+const registerImg = '../../../log-in.svg'
 
 export function Header() {
     return(
