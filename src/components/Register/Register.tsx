@@ -1,9 +1,13 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext.tsx";
 
 
 export default function Register() {
+
     // Состояния для формы регистрации
+    const {setUser} = useAuth();
+
     const [regEmail, setRegEmail] = useState("");
     const [regPassword, setRegPassword] = useState("");
     const [regConfirmPassword, setRegConfirmPassword] = useState("");
@@ -51,11 +55,10 @@ export default function Register() {
             })
             const json = await res.json();
 
-            console.log(json);
         }catch(err) {
             console.log(err);
         }
-        // nav('/profile');
+        nav('/profile');
 
 
     }
@@ -63,6 +66,8 @@ export default function Register() {
     // Обработка и проверка формы ВХОДА
     async function handleLoginSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+
         setLoginError("");
 
         try {
@@ -73,6 +78,8 @@ export default function Register() {
             });
 
             const data = await res.json();
+
+            setUser(data);
 
             if (data.user === true) {
                 nav("/profile");

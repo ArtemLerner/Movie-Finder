@@ -4,13 +4,14 @@ import SearchPage from "../pages/SearchPage/SearchPage.tsx";
 import {Header} from "../components/Header/Header.tsx";
 import RegisterPage from "../pages/RegisterPage/RegisterPage.tsx";
 import Profile from "../pages/ProfilePage";
+import {AuthProvider} from "../context/AuthContext.tsx";
 
 
 
 export function Router() {
 
     return(
-        <>
+        <AuthProvider>
             <BrowserRouter>
                 <Header/>
                 <Routes>
@@ -20,7 +21,7 @@ export function Router() {
                     <Route path="/profile" element={<Profile/>} />
                 </Routes>
             </BrowserRouter>
-        </>
+        </AuthProvider>
     )
 
 }

@@ -9,11 +9,9 @@ router.post('/register', async (req, res) => {
     const { email, password } = req.body;
     const passHash = await bcrypt.hash(password, 10);
 
-    // 1. Базовая проверка
     if (!email || !password || password.length < 6) {
         return res.status(400).json({ message: "Некорректные данные" });
     }
-
 
     const newUser = await pool.query(
          `INSERT INTO users (email, password) VALUES ($1, $2)`,
@@ -28,7 +26,6 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
-    // 1. Базовая проверка
     if (!email || !password || password.length < 6) {
         return res.status(400).json({ message: "Некорректные данные" });
     }
@@ -40,8 +37,6 @@ router.post('/login', async (req, res) => {
 
     const user = userCheck.rows[0]
 
-
-
     if(user && (await bcrypt.compare(password, user.password))) {
         return res.json({ user: true });
     }else{
@@ -49,15 +44,6 @@ router.post('/login', async (req, res) => {
     }
 })
 
-
-router.get('/users', async (req, res) => {
-    try {
-        const result = await pool.query("SELECT password, email FROM users");
-        res.json(result.rows);
-    } catch (error) {
-        res.status(500).json({ message: "Ошибка при чтении из БД" });
-    }
-});
 
 
 export default router;

@@ -1,6 +1,6 @@
 ## TODO
 
-- [ ] User authentication (token and cookie storage)
+- [x] User authentication (token and cookie storage)
 - [ ] User profile page
 - [ ] Movie details page
 - [ ] Show favorite movies in the profile
