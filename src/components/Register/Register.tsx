@@ -48,17 +48,21 @@ export default function Register() {
         // Если все проверки пройдены — отправляем данные на сервер
 
         try {
-            const res = await fetch("http://localhost:3000/api/auth/register", {
+            const res = await fetch("http://localhost:3000/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({email: regEmail, password: regPassword})
             })
             const json = await res.json();
 
+            if (json.ok) {
+                nav('/profile');
+            }else {
+                setRegError("Email already exists!");
+            }
         }catch(err) {
             console.log(err);
         }
-        nav('/profile');
 
 
     }

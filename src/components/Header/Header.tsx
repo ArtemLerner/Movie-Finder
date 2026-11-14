@@ -10,6 +10,7 @@ const userImg = '../../../profile.svg'
 export function Header() {
     const {user} = useAuth();
 
+
     return(
         <header id="header">
             <div className="header_block">

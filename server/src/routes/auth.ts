@@ -13,14 +13,22 @@ router.post('/register', async (req, res) => {
         return res.status(400).json({ message: "Некорректные данные" });
     }
 
-    const newUser = await pool.query(
-         `INSERT INTO users (email, password) VALUES ($1, $2)`,
+    const user = await pool.query(
+        `SELECT * FROM users WHERE email = $1`,
+        [email]
+        )
+
+    const userRow = user.rows[0];
+
+    if (!userRow) {
+        const newUser = await pool.query(
+            `INSERT INTO users (email, password) VALUES ($1, $2)`,
             [email, passHash]
-    )
-    return res.status(200).json({
-        message: "Данные успешно дошли до сервера!",
-        user: { newUser }
-    });
+        )
+        return res.json({ ok: true, user: newUser });
+    }else {
+        return res.json({ ok: false });
+    }
 })
 
 router.post('/login', async (req, res) => {
