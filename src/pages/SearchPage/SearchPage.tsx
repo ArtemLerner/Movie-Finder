@@ -13,6 +13,7 @@ export default function SearchPage(){
 
 
     useEffect(() => {
+
         SearchMovies(query)
             .then(movies => setResults(movies ?? []));
     }, [query]);

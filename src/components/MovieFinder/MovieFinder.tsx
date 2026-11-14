@@ -6,6 +6,12 @@ export default function MovieFinder() {
     const [value, setValues] = useState('');
     const navigate = useNavigate();
 
+    function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setValues(e.target.value);
+        const text = e.target.value.trim();
+        navigate("/search?q=" + encodeURIComponent(text));
+    }
+
     function handleFormSubmit(e: React.FormEvent) {
         e.preventDefault();
         const text = value.trim();
@@ -31,13 +37,10 @@ export default function MovieFinder() {
 
                     placeholder="Найти фильм или сериал..."
                     value={value}
-                    onChange={(e)=>{
-                        setValues(e.target.value);
-                    }}
+                    onChange={handleOnChange}
                 />
                 <button type={"submit"} className='search__button'>submit</button>
             </form>
-
         </div>
     )
 
