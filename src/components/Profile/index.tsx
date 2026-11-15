@@ -6,6 +6,8 @@ export default function Profile() {
     const {user, setUser} = useAuth();
     const nav = useNavigate();
 
+    const VITE_URL = import.meta.env.VITE_URL;
+
     useEffect(() => {
         if (!user) nav('/register');
     })
@@ -14,7 +16,7 @@ export default function Profile() {
 
     async function handleLogOut(){
         try{
-            await fetch("http://localhost:3000/auth/logout", {
+            await fetch(`${VITE_URL}/auth/logout`, {
                 method: "POST",
                 credentials: "include",
             })
