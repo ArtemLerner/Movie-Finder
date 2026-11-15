@@ -4,18 +4,21 @@ import type {MovieCartType} from "../../share/types/MovieCart.ts";
 import {SearchMovies} from "../../api/movie.ts";
 import "swiper/css";
 import "swiper/css/navigation";
-import { useSearchParams } from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 
 export default function SearchPage(){
     const [results, setResults] = useState<MovieCartType[]>([]);
     const [searchParams] = useSearchParams();
     const query = searchParams.get("q") ?? "";
 
+    const nav = useNavigate();
 
     useEffect(() => {
-
         SearchMovies(query)
             .then(movies => setResults(movies ?? []));
+        if(query === ''){
+            nav('/');
+        }
     }, [query]);
     return (
         <>
