@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.tsx";
+import Loading from "../Loading/Loading.tsx";
 
 export default function Register() {
 
@@ -27,7 +28,8 @@ export default function Register() {
     const [loginError, setLoginError] = useState("");
 
 
-
+    const [loadingReg, setLoadingReg] = useState(false);
+    const [loadingLog, setLoadingLog] = useState(false);
 
 
     // Обработка и проверка формы РЕГИСТРАЦИИ
@@ -58,11 +60,13 @@ export default function Register() {
         // Если все проверки пройдены — отправляем данные на сервер
 
         try {
+            setLoadingReg(true);
             const res = await fetch(`${SERVER_URL}/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({email: regEmail, password: regPassword})
-            })
+            }).finally(()=>setLoadingReg(false))
+
             const data = await res.json();
 
             if (res.ok) {
@@ -86,12 +90,13 @@ export default function Register() {
         setLoginError("");
 
         try {
+            setLoadingLog(true);
             const res = await fetch(`${SERVER_URL}/auth/login`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-            });
+            }).finally(()=>setLoadingLog(false));
 
             const data = await res.json();
 
@@ -111,65 +116,69 @@ export default function Register() {
 
 
     return (
-        <div className={'register-page'}>
 
+        <div className={'register-page'}>
             {/* Блок регистрации */}
             <div className={'register-block'}>
                 <h1>Register</h1>
-                <form title={"Register"} className={'register-form'} onSubmit={handleRegisterSubmit} noValidate>
+                {loadingReg ? <Loading/> :
+                    <form title={"Register"} className={'register-form'} onSubmit={handleRegisterSubmit} noValidate>
 
-                    <label>email:</label>
-                    <input
-                        type="email"
-                        value={regEmail}
-                        onChange={(e) => setRegEmail(e.target.value)}
-                    />
+                        <label>email:</label>
+                        <input
+                            type="email"
+                            value={regEmail}
+                            onChange={(e) => setRegEmail(e.target.value)}
+                        />
 
-                    <label>password:</label>
-                    <input
-                        type="password"
-                        value={regPassword}
-                        onChange={(e) => setRegPassword(e.target.value)}
-                    />
+                        <label>password:</label>
+                        <input
+                            type="password"
+                            value={regPassword}
+                            onChange={(e) => setRegPassword(e.target.value)}
+                        />
 
-                    <label>password confirm:</label>
-                    <input
-                        type="password"
-                        value={regConfirmPassword}
-                        onChange={(e) => setRegConfirmPassword(e.target.value)}
-                    />
+                        <label>password confirm:</label>
+                        <input
+                            type="password"
+                            value={regConfirmPassword}
+                            onChange={(e) => setRegConfirmPassword(e.target.value)}
+                        />
 
-                    {/* Вывод ошибки, если она есть */}
-                    {regError && <p style={{ color: "red", fontSize: "14px" }}>{regError}</p>}
+                        {/* Вывод ошибки, если она есть */}
+                        {regError && <p style={{ color: "red", fontSize: "14px" }}>{regError}</p>}
 
-                    <button type={"submit"}>submit</button>
-                </form>
+                        <button type={"submit"}>submit</button>
+                    </form>
+                }
             </div>
 
             {/* Блок входа */}
             <div className={'log-in-block'}>
                 <h1>log-in</h1>
-                <form title={"log-in"} className={'register-form'} onSubmit={handleLoginSubmit} noValidate>
+                {loadingLog ? <Loading/> :
+                    <form title={"log-in"} className={'register-form'} onSubmit={handleLoginSubmit} noValidate>
 
-                    <label>email:</label>
-                    <input
-                        type="email"
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                    />
+                        <label>email:</label>
+                        <input
+                            type="email"
+                            value={loginEmail}
+                            onChange={(e) => setLoginEmail(e.target.value)}
+                        />
 
-                    <label>password:</label>
-                    <input
-                        type="password"
-                        value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
-                    />
+                        <label>password:</label>
+                        <input
+                            type="password"
+                            value={loginPassword}
+                            onChange={(e) => setLoginPassword(e.target.value)}
+                        />
 
-                    {/* Вывод ошибки, если она есть */}
-                    {loginError && <p style={{ color: "red", fontSize: "14px" }}>{loginError}</p>}
+                        {/* Вывод ошибки, если она есть */}
+                        {loginError && <p style={{ color: "red", fontSize: "14px" }}>{loginError}</p>}
 
-                    <button type={"submit"}>submit</button>
-                </form>
+                        <button type={"submit"}>submit</button>
+                    </form>
+                }
             </div>
 
         </div>

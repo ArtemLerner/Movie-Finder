@@ -9,4 +9,5 @@ export interface User {
 export interface AuthContextTypes {
     user: User | null;
     setUser: Dispatch<SetStateAction<User | null>>;
+    loading: boolean | null;
 }

@@ -8,6 +8,7 @@ import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import Loading from "../Loading/Loading.tsx";
 
 
 
@@ -23,10 +24,12 @@ const buttonsTrending = [
 export default function TrendingSection({ mediaType }: Props) {
     const [movies, setMovies] = useState<MovieCartType[]>([]);
     const [timeWindow, setTimeWindow] = useState<timeWindow>('day')
-
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        Movie(mediaType, timeWindow).then(movies => setMovies(movies ?? []));
+        Movie(mediaType, timeWindow)
+            .then(movies => setMovies(movies ?? []))
+            .finally(() => setLoading(false));
     }, [mediaType, timeWindow]);
 
 
@@ -40,27 +43,32 @@ export default function TrendingSection({ mediaType }: Props) {
                 <h2>Trending {`${mediaType}`}</h2>
 
             </div>
+            {
+                loading
+                    ?
+                    <Loading/>
+                    :
+                    <div className="movie-list">
+                        <Swiper
+                            modules={[Navigation]}
+                            navigation
+                            spaceBetween={16}
+                            slidesPerView={6}
+                            breakpoints={{
+                                768: { slidesPerView: 4 },
+                                1200: { slidesPerView: 6 },
+                            }}
+                        >
+                            {movies.map(movie =>
+                                <SwiperSlide key={movie.id}>
+                                    <MovieCart key={movie.poster_path} data={movie}/>
+                                </SwiperSlide>
+                            )}
 
-            <div className="movie-list">
-                <Swiper
-                    modules={[Navigation]}
-                    navigation
-                    spaceBetween={16}
-                    slidesPerView={6}
-                    breakpoints={{
-                        768: { slidesPerView: 4 },
-                        1200: { slidesPerView: 6 },
-                    }}
-                >
-                {movies.map(movie =>
-                   <SwiperSlide key={movie.id}>
-                       <MovieCart key={movie.poster_path} data={movie}/>
-                   </SwiperSlide>
-                )}
+                        </Swiper>
 
-                </Swiper>
-
-            </div>
+                    </div>
+            }
         </div>
 
     )

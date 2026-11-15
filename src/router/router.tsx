@@ -4,6 +4,7 @@ import SearchPage from "../pages/SearchPage/SearchPage.tsx";
 import {Header} from "../components/Header/Header.tsx";
 import RegisterPage from "../pages/RegisterPage/RegisterPage.tsx";
 import Profile from "../pages/ProfilePage";
+import GuestRouter, {ProtectedRouter} from "../context/AuthContext.tsx";
 
 
 
@@ -14,9 +15,9 @@ export function Router() {
                 <Header/>
                 <Routes>
                     <Route path="/" element={<HomePage/>} />
-                    <Route path="/search" element={<SearchPage/>} />
-                    <Route path="/register" element={<RegisterPage/>} />
-                    <Route path="/profile" element={<Profile/>}
+                    <Route path="/search" element={<GuestRouter><SearchPage/></GuestRouter>} />
+                    <Route path="/register" element={<GuestRouter><RegisterPage/></GuestRouter>} />
+                    <Route path="/profile" element={<ProtectedRouter><Profile/></ProtectedRouter>}
                     />
                 </Routes>
             </BrowserRouter>
