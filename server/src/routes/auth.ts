@@ -59,7 +59,10 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/logout', async (_req, res) => {
-    res.clearCookie('token');
+    const isProd = process.env.NODE_ENV === "production";
+
+    res.clearCookie('token',
+        { httpOnly: true, secure: isProd, sameSite: isProd ? "none" : "lax" });
     res.json({ message: "Logged out" });
 })
 
@@ -104,14 +107,14 @@ function setAuthCookie(res: express.Response, userId: number) {
 
     const token = jwt.sign({id: userId}, SECRET!, {'expiresIn': '7d'});
 
+    const isProd = process.env.NODE_ENV === "production";
 
-    res.cookie('token', token,
-        {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax" as const,
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        })
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
 }
 
 
