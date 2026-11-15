@@ -1,3 +1,7 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/auth/:path*", "destination": "https://movie-finder-gkru.onrender.com/auth/:path*" },
+    { "source": "/api/:path*", "destination": "https://movie-finder-gkru.onrender.com/api/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
