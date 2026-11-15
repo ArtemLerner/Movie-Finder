@@ -1,12 +1,20 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.tsx";
 
-
 export default function Register() {
 
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
     // Состояния для формы регистрации
-    const {setUser} = useAuth();
+    const {user,setUser} = useAuth();
+    const nav = useNavigate();
+
+    useEffect(() => {
+        if(user){
+            nav('/profile', {replace: true});
+        }
+    });
 
     const [regEmail, setRegEmail] = useState("");
     const [regPassword, setRegPassword] = useState("");
@@ -18,7 +26,9 @@ export default function Register() {
     const [loginPassword, setLoginPassword] = useState("");
     const [loginError, setLoginError] = useState("");
 
-    const nav = useNavigate();
+
+
+
 
     // Обработка и проверка формы РЕГИСТРАЦИИ
     async function handleRegisterSubmit(e: React.FormEvent) {
@@ -48,14 +58,15 @@ export default function Register() {
         // Если все проверки пройдены — отправляем данные на сервер
 
         try {
-            const res = await fetch("http://localhost:3000/auth/register", {
+            const res = await fetch(`${SERVER_URL}/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({email: regEmail, password: regPassword})
             })
-            const json = await res.json();
+            const data = await res.json();
 
-            if (json.ok) {
+            if (res.ok) {
+                setUser(data);
                 nav('/profile');
             }else {
                 setRegError("Email already exists!");
@@ -75,26 +86,29 @@ export default function Register() {
         setLoginError("");
 
         try {
-            const res = await fetch("http://localhost:3000/auth/login", {
+            const res = await fetch(`${SERVER_URL}/auth/login`, {
                 method: "POST",
+                credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: loginEmail, password: loginPassword }),
             });
 
             const data = await res.json();
 
-            setUser(data);
 
-            if (data.user === true) {
+            if (res.ok) {
+                setUser(data);
                 nav("/profile");
             } else {
-                setLoginError("Неверный email или пароль.");
+                setLoginError(data.message);
             }
 
         } catch (err) {
             setLoginError("Не удалось связаться с сервером.");
         }
     }
+
+
 
     return (
         <div className={'register-page'}>

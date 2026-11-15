@@ -17,14 +17,11 @@ export function Header() {
                 <NavLink to='/'>Головна</NavLink>
                 <nav>
                     <MovieFinder/>
-
-                    <NavLink to='/register'>
                         {user ?
-                            <img className={'register-img'} src={userImg}/>
+                            <NavLink to='/profile'> <img className={'register-img'} src={userImg}/></NavLink>
                             :
-                            <img className={'register-img'} src={registerImg}/>
+                            <NavLink to='/register'><img className={'register-img'} src={registerImg}/></NavLink>
                         }
-                    </NavLink>
                 </nav>
 
             </div>
