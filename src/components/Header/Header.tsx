@@ -5,7 +5,7 @@ import {useAuth} from "../../context/AuthContext.tsx";
 
 const registerImg = '../../../log-in.svg'
 const userImg = '../../../profile.svg'
-
+const logo = '../../../logo.svg'
 
 export function Header() {
     const {user} = useAuth();
@@ -14,7 +14,7 @@ export function Header() {
     return(
         <header id="header">
             <div className="header_block">
-                <NavLink to='/'>Головна</NavLink>
+                <NavLink to='/'><img className={'logo'} src={logo}/></NavLink>
                 <nav>
                     <MovieFinder/>
                         {user ?

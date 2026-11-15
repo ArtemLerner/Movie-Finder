@@ -737,7 +737,9 @@ header { max-width: 1371px; margin: 0 auto; }
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
-
+.logo{
+    height: 60px;
+}
 .profile{
     padding-top: 20px;
 }
