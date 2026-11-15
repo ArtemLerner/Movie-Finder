@@ -11,14 +11,15 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 
+app.set('trust proxy', 1);
 
 app.use(cors({
     origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'https://movie-finder-one-zeta.vercel.app'],
     credentials: true,
 }));
-
-app.use(express.json());
 app.use(cookieParser())
+app.use(express.json());
+
 
 
 
