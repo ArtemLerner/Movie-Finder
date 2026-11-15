@@ -1,6 +1,7 @@
 ## TODO
 
 - [x] User authentication (token and cookie storage)
+- [ ] add loading for all
 - [ ] User profile page
 - [ ] Movie details page
 - [ ] Show favorite movies in the profile
