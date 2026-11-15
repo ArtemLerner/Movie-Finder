@@ -21,6 +21,7 @@ router.post('/register', async (req, res) => {
 
     const user = userFind.rows[0];
 
+
     if (!user) {
         const newUser = await pool.query(
             `INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email`,
