@@ -2,6 +2,8 @@ import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.tsx";
 import Loading from "../Loading/Loading.tsx";
+import SignIn from "../Popup/sign-in.tsx";
+import type {User} from "../../share/types/User.ts";
 
 export default function Register() {
 
@@ -27,6 +29,7 @@ export default function Register() {
     const [loginPassword, setLoginPassword] = useState("");
     const [loginError, setLoginError] = useState("");
 
+    const [popup, setPopup] = useState(false);
 
     const [loadingReg, setLoadingReg] = useState(false);
     const [loadingLog, setLoadingLog] = useState(false);
@@ -59,22 +62,24 @@ export default function Register() {
 
         // Если все проверки пройдены — отправляем данные на сервер
 
+
+        setPopup(true);
+
         try {
-            setLoadingReg(true);
-            const res = await fetch(`${SERVER_URL}/auth/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({email: regEmail, password: regPassword})
-            }).finally(()=>setLoadingReg(false))
-
-            const data = await res.json();
-
-            if (res.ok) {
-                setUser(data);
-                nav('/profile');
-            }else {
-                setRegError("Email already exists!");
-            }
+            // setLoadingReg(true);
+            // const res = await fetch(`${SERVER_URL}/auth/register`, {
+            //     method: "POST",
+            //     headers: { "Content-Type": "application/json" },
+            //     body: JSON.stringify({email: regEmail, password: regPassword})
+            // }).finally(()=>setLoadingReg(false))
+            //
+            // const data = await res.json();
+            // if (res.ok) {
+            //     setUser(data);
+            //
+            // }else {
+            //     setRegError("Email already exists!");
+            // }
         }catch(err) {
             console.log(err);
         }
@@ -113,6 +118,9 @@ export default function Register() {
         }
     }
 
+    const handleTokenSet = (token: string) => {
+        console.log("token", token);
+    }
 
 
     return (
@@ -122,7 +130,10 @@ export default function Register() {
             <div className={'register-block'}>
                 <h1>Register</h1>
                 {loadingReg ? <Loading/> :
-                    <form title={"Register"} className={'register-form'} onSubmit={handleRegisterSubmit} noValidate>
+                    <form title={"Register"} className={'register-form'}
+                          onSubmit={handleRegisterSubmit} noValidate>
+                        {popup &&
+                            <SignIn user={{ email: regEmail } as User} verify={handleTokenSet}/>}
 
                         <label>email:</label>
                         <input
