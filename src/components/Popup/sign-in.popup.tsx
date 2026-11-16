@@ -31,7 +31,7 @@ export default function SignInPopup({user, verify}: SignInPopup) {
                         className="verify-popup__input"
                         type="text"
                         inputMode="numeric"
-                        maxLength="6"
+                        maxLength={6}
                         placeholder="000000"
                         value={token}
                         onChange={(e) => setToken(e.target.value)}

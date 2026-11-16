@@ -1,7 +1,6 @@
 import MovieFinder from '../MovieFinder/MovieFinder'
 import {NavLink} from 'react-router-dom'
 import {useAuth} from "../../context/AuthContext.tsx";
-import {useState} from "react";
 import Loading from "../Loading/Loading.tsx";
 
 

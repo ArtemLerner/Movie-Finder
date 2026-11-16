@@ -74,16 +74,14 @@ export default function SignIn() {
                 body: JSON.stringify({email: regEmail, password: regPassword})
             }).finally(()=>setLoadingReg(false))
 
-            const data = await res.json()
 
             if (res.ok) {
                 setPopup(true);
-                console.log(data.email_token)
             }else {
                 setRegError("Email already exists!");
             }
         }catch(err) {
-            console.log(err);
+            console.log(err.message);
         }
     }
 
@@ -109,6 +107,7 @@ export default function SignIn() {
                 setUser(data);
                 nav("/profile");
             } else {
+                console.log(data.message);
                 setLoginError(data.message);
             }
 
@@ -135,11 +134,12 @@ export default function SignIn() {
                     nav('/profile');
                     return true
             }else{
+                console.log(data.message);
                 return false;
             }
 
         }catch(err) {
-            console.log(err);
+            console.log(err.message);
             return false;
         }
     }
