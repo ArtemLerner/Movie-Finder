@@ -81,7 +81,7 @@ export default function SignIn() {
                 setRegError("Email already exists!");
             }
         }catch(err) {
-            console.log(err.message);
+            console.log(err);
         }
     }
 
@@ -139,7 +139,7 @@ export default function SignIn() {
             }
 
         }catch(err) {
-            console.log(err.message);
+            console.log(err);
             return false;
         }
     }

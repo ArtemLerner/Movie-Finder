@@ -2,7 +2,7 @@
 
 - [x] User authentication (token and cookie storage)
 - [x] add loading for all
-- [ ] email checker on reg
+- [x] email checker on reg
 - [ ] User profile page
 - [ ] Movie details page
 - [ ] Show favorite movies in the profile
