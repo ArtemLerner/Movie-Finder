@@ -9,7 +9,7 @@ import {Navigation} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import Loading from "../Loading/Loading.tsx";
-
+import type SwiperType from "swiper"
 
 
 interface Props {
@@ -25,6 +25,8 @@ export default function TrendingSection({ mediaType }: Props) {
     const [movies, setMovies] = useState<MovieCartType[]>([]);
     const [timeWindow, setTimeWindow] = useState<timeWindow>('day')
     const [loading, setLoading] = useState<boolean>(true);
+
+    const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
 
     useEffect(() => {
         Movie(mediaType, timeWindow)
@@ -53,15 +55,18 @@ export default function TrendingSection({ mediaType }: Props) {
                             modules={[Navigation]}
                             navigation
                             spaceBetween={16}
-                            slidesPerView={6}
+                            freeMode
+                            slidesPerView="auto"
+                            onSwiper={setSwiperInstance}
                             breakpoints={{
+                                390: { slidesPerView: 2 },
                                 768: { slidesPerView: 4 },
                                 1200: { slidesPerView: 6 },
                             }}
                         >
                             {movies.map(movie =>
                                 <SwiperSlide key={movie.id}>
-                                    <MovieCart key={movie.poster_path} data={movie}/>
+                                    <MovieCart key={movie.poster_path} swiper={swiperInstance} data={movie}/>
                                 </SwiperSlide>
                             )}
 

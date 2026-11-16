@@ -1,49 +1,109 @@
-/* ============ Tokens ============ */
+/* ==========================================================================
+   MOVIES — единый index.css
+   Структура:
+     1. Tokens          7. Search
+     2. Base            8. Sign in / Log in
+     3. Header          9. Profile (билет)
+     4. Page / status  10. Verify popup
+     5. Trending       11. Mobile: ≤768 → ≤640 → ≤480 → ≤360 → landscape
+     6. Cards/Grid/Swiper  12. Reduced motion
+
+   Нужен <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+   Размер постера везде управляется одной переменной --card-width.
+   ========================================================================== */
+
+
+/* ============ 1. Tokens ============ */
 :root {
     --bg: #0a0a10;
     --surface: #17171f;
+    --surface-2: #1e1e28;
     --text: #f4f1ee;
     --muted: #8c8a97;
     --accent: #ff7a3d;
     --accent-ink: #1d0e06;
     --accent-glow: rgba(255, 122, 61, 0.38);
     --edge: rgba(255, 255, 255, 0.08);
+    --edge-strong: rgba(255, 255, 255, 0.15);
     --danger: #ff6b6b;
+
     --gutter: 16px;
+    --card-width: clamp(108px, 18vw, 200px);
+    --radius-card: 16px;
+
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --glass: rgba(10, 10, 16, 0.72);
 }
 
-/* ============ Base ============ */
+
+/* ============ 2. Base ============ */
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
 
 body {
     margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
     color: var(--text);
     font-family: "Manrope", system-ui, -apple-system, sans-serif;
-    background:
-            radial-gradient(900px 420px at 15% -10%, rgba(255, 122, 61, 0.1), transparent 70%),
-            radial-gradient(700px 380px at 90% 0%, rgba(90, 80, 200, 0.12), transparent 70%),
-            var(--bg);
-    background-attachment: fixed;
+    background: var(--bg);
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-#root { padding: 30px; }
+/* Фоновое свечение. Отдельный fixed-слой вместо background-attachment: fixed —
+   на iOS fixed-фон лагает и «прыгает» при скролле, а слой — нет. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+            radial-gradient(900px 420px at 15% -10%, rgba(255, 122, 61, 0.12), transparent 70%),
+            radial-gradient(700px 380px at 90% 0%, rgba(90, 80, 200, 0.14), transparent 70%);
+}
 
 a { color: inherit; text-decoration: none; }
 
 img { -webkit-user-drag: none; }
 
+button, input { font-family: inherit; }
+
 ::selection { background: var(--accent); color: var(--accent-ink); }
 
-/* ============ Header ============ */
-header { max-width: 1371px; margin: 0 auto; }
+
+/* ============ 3. Header ============ */
+/* Липкая «стеклянная» шапка на всех экранах.
+   Контент выровнен по колонке 1371px, а стекло тянется на всю ширину. */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding:
+            calc(10px + env(safe-area-inset-top))
+            max(var(--gutter), env(safe-area-inset-right), calc((100% - 1371px) / 2))
+            10px
+            max(var(--gutter), env(safe-area-inset-left), calc((100% - 1371px) / 2));
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%);
+    border-bottom: 1px solid var(--edge);
+}
 
 .header_block {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+    min-height: 52px;
 }
 
 .header_block nav {
@@ -52,10 +112,18 @@ header { max-width: 1371px; margin: 0 auto; }
     gap: 20px;
 }
 
+.logo { height: 52px; width: auto; }
 .logo-img { width: 40px; }
-.register-img { width: 32px; height: 32px; }
 
-/* ============ Page layout ============ */
+.register-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: transform 0.2s var(--ease), box-shadow 0.2s ease;
+}
+
+
+/* ============ 4. Page layout ============ */
 .page {
     max-width: 1400px;
     margin: 0 auto;
@@ -78,7 +146,30 @@ header { max-width: 1371px; margin: 0 auto; }
     font-weight: 600;
 }
 
-/* ============ Trending header + day/week switch ============ */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 48px var(--gutter);
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid var(--edge);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* ============ 5. Trending header + переключатель День/Неделя ============ */
 .trending__header {
     display: flex;
     align-items: center;
@@ -91,7 +182,7 @@ header { max-width: 1371px; margin: 0 auto; }
 .trending__header h2,
 .trending h2 {
     margin: 0;
-    font-size: 24px;
+    font-size: 30px;
     font-weight: 800;
     letter-spacing: -0.02em;
 }
@@ -135,14 +226,16 @@ header { max-width: 1371px; margin: 0 auto; }
 
 .buttons button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 
-/* ============ Horizontal strip ============ */
+
+/* ============ 6a. Горизонтальная лента ============ */
 .movie-list {
     display: flex;
-    gap: 16px;
-    padding: 20px var(--gutter) 48px;
+    gap: 24px;
+    padding: 28px var(--gutter) 48px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-padding: 0 var(--gutter);
+    overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--gutter), #000 calc(100% - 56px), transparent 100%);
@@ -151,21 +244,24 @@ header { max-width: 1371px; margin: 0 auto; }
 
 .movie-list::-webkit-scrollbar { display: none; }
 
-/* ============ Movie card ============ */
+
+/* ============ 6b. Карточка фильма ============ */
 .movie-block {
     position: relative;
     flex: 0 0 auto;
-    width: 148px;
+    width: var(--card-width);
     aspect-ratio: 2 / 3;
-    border-radius: 14px;
+    border-radius: var(--radius-card);
     overflow: hidden;
+    isolation: isolate;
     scroll-snap-align: start;
     background: var(--surface);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
+    transition: transform 0.35s var(--ease), box-shadow 0.35s ease;
     cursor: pointer;
 }
 
+/* тонкая внутренняя рамка поверх постера */
 .movie-block::after {
     content: "";
     position: absolute;
@@ -181,9 +277,11 @@ header { max-width: 1371px; margin: 0 auto; }
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: transform 0.6s var(--ease);
 }
 
+/* Название: по умолчанию ВСЕГДА видно (на тач-экранах hover'а нет).
+   На устройствах с мышью прячется и появляется по наведению — см. блок ниже. */
 .movie-block p {
     position: absolute;
     left: 0;
@@ -191,33 +289,58 @@ header { max-width: 1371px; margin: 0 auto; }
     bottom: 0;
     z-index: 2;
     margin: 0;
-    padding: 56px 12px 14px;
+    padding: 48px 12px 13px;
     color: #fff;
     font-size: 14px;
     font-weight: 700;
     line-height: 1.3;
-    background: linear-gradient(to top, rgba(8, 8, 14, 0.95) 15%, transparent);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    background: linear-gradient(to top, rgba(8, 8, 14, 0.95) 12%, transparent);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     pointer-events: none;
 }
 
-.movie-block:hover,
-.movie-block:focus-visible {
-    transform: translateY(-8px) scale(1.04);
-    box-shadow: 0 18px 44px var(--accent-glow), 0 6px 16px rgba(0, 0, 0, 0.6);
-}
-
-.movie-block:hover img,
-.movie-block:focus-visible img { transform: scale(1.07); }
-
-.movie-block:hover p,
-.movie-block:focus-visible p { opacity: 1; transform: translateY(0); }
-
 .movie-block:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-/* Card without a poster (.no-poster is kept for existing markup) */
+/* Hover только для мыши — на телефоне он «залипает» после тапа */
+@media (hover: hover) and (pointer: fine) {
+    .movie-block p {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* блик, пробегающий по постеру */
+    .movie-block::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.14) 50%, transparent 65%);
+        transform: translateX(-120%);
+        transition: transform 0.8s var(--ease);
+        pointer-events: none;
+    }
+
+    .movie-block:hover,
+    .movie-block:focus-visible {
+        box-shadow: 0 18px 44px var(--accent-glow), 0 6px 16px rgba(0, 0, 0, 0.6);
+    }
+
+
+
+    .movie-block:hover::before,
+    .movie-block:focus-visible::before { transform: translateX(120%); }
+
+    .movie-block:hover p,
+    .movie-block:focus-visible p { opacity: 1; transform: translateY(0); }
+
+    .register-img:hover { box-shadow: 0 0 0 2px var(--accent); }
+}
+
+/* Карточка без постера (.no-poster оставлен для старой разметки) */
 .movie-block__empty,
 .no-poster {
     display: flex;
@@ -234,22 +357,30 @@ header { max-width: 1371px; margin: 0 auto; }
     background: linear-gradient(160deg, rgba(255, 122, 61, 0.12), transparent 60%), var(--surface);
 }
 
-/* ============ Grids (.movie-cart kept as an alias) ============ */
+
+/* ============ 6c. Сетки (.movie-cart — алиас) ============ */
 .movies-grid,
 .movie-cart {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 24px;
 }
 
 .movies-grid .movie-block,
 .movie-cart .movie-block { width: 100%; }
 
-/* ============ Swiper ============ */
+
+/* ============ 6d. Swiper ============ */
 .swiper {
     --swiper-theme-color: var(--accent);
     --swiper-navigation-size: 20px;
     padding: 24px var(--gutter) 48px;
+}
+
+/* ширина слайда — из CSS (нужен slidesPerView="auto"); !important перебивает inline-ширину Swiper */
+.swiper-slide {
+    width: var(--card-width) !important;
+    height: auto;
 }
 
 .swiper-slide .movie-block { width: 100%; }
@@ -270,12 +401,15 @@ header { max-width: 1371px; margin: 0 auto; }
 .swiper-button-prev:hover {
     background: var(--accent);
     --swiper-navigation-color: var(--accent-ink);
-    transform: scale(1.08);
 }
 
 .swiper-button-disabled { opacity: 0; pointer-events: none; }
 
-/* ============ Search ============ */
+.swiper-pagination-bullet { background: var(--muted); opacity: 0.5; }
+.swiper-pagination-bullet-active { background: var(--accent); opacity: 1; }
+
+
+/* ============ 7. Search ============ */
 .search {
     display: flex;
     align-items: center;
@@ -293,6 +427,7 @@ header { max-width: 1371px; margin: 0 auto; }
     border: 1px solid var(--edge);
     border-radius: 999px;
     background-color: rgba(255, 255, 255, 0.06);
+    /* ВАЖНО: xmlns должен быть http://www.w3.org/2000/svg — иначе иконка лупы не рисуется */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238c8a97' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: 18px center;
@@ -315,7 +450,7 @@ header { max-width: 1371px; margin: 0 auto; }
     box-shadow: 0 0 0 4px var(--accent-glow);
 }
 
-/* Primary button: search + forms share it */
+/* Основная кнопка: поиск + формы */
 .search__button,
 .register-form button[type="submit"] {
     appearance: none;
@@ -341,20 +476,29 @@ header { max-width: 1371px; margin: 0 auto; }
     text-transform: capitalize;
 }
 
-.search__button:hover,
-.register-form button[type="submit"]:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.08);
-    box-shadow: 0 10px 28px var(--accent-glow);
-}
-
 .search__button:active,
-.register-form button[type="submit"]:active { transform: translateY(0) scale(0.97); }
+.register-form button[type="submit"]:active { }
 
 .search__button:focus-visible,
 .register-form button[type="submit"]:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
-/* ============ Sign-in / Log in ============ */
+.register-form button[type="submit"]:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .search__button:hover,
+    .register-form button[type="submit"]:hover:not(:disabled) {
+        transform: translateY(-2px);
+        filter: brightness(1.08);
+        box-shadow: 0 10px 28px var(--accent-glow);
+    }
+}
+
+
+/* ============ 8. Sign in / Log in ============ */
 .register-page {
     display: flex;
     justify-content: center;
@@ -366,14 +510,18 @@ header { max-width: 1371px; margin: 0 auto; }
 .register-block,
 .log-in-block {
     width: 50%;
+    max-width: 520px;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 28px 0;
     border-radius: 24px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)), var(--surface);
+    background:
+            radial-gradient(320px 160px at 10% -10%, rgba(255, 122, 61, 0.1), transparent 70%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
+            var(--surface);
     border: 1px solid var(--edge);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -381,8 +529,8 @@ header { max-width: 1371px; margin: 0 auto; }
 
 .register-block:hover,
 .log-in-block:hover {
-    border-color: rgba(255, 255, 255, 0.14);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+    border-color: var(--edge-strong);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .register-block h1,
@@ -432,7 +580,7 @@ header { max-width: 1371px; margin: 0 auto; }
 
 .register-form input:hover {
     background-color: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--edge-strong);
 }
 
 .register-form input:focus {
@@ -446,11 +594,12 @@ header { max-width: 1371px; margin: 0 auto; }
 .register-form input:-webkit-autofill:hover,
 .register-form input:-webkit-autofill:focus {
     -webkit-text-fill-color: var(--text);
-    -webkit-box-shadow: 0 0 0 1000px #1e1e28 inset;
+    -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset;
+    caret-color: var(--text);
     transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Validation error. Prefer <p className="form-error">; the .register-form p fallback keeps old markup working */
+/* Ошибка валидации. Лучше <p className="form-error">; .register-form p — запасной вариант для старой разметки */
 .form-error,
 .register-form p {
     margin: -6px 0 18px;
@@ -463,55 +612,14 @@ header { max-width: 1371px; margin: 0 auto; }
     font-weight: 600;
 }
 
-/* ============ Responsive ============ */
-@media (hover: none) {
-    .movie-block p { opacity: 1; transform: none; }
-}
 
-@media (min-width: 768px) {
-    :root { --gutter: 40px; }
-
-    .trending__header h2,
-    .trending h2 { font-size: 30px; }
-
-    .movie-list { gap: 24px; padding-top: 28px; }
-    .movie-block { width: 208px; border-radius: 16px; }
-
-    .movies-grid,
-    .movie-cart { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 24px; }
-}
-
-@media (min-width: 1280px) {
-    .movie-block { width: 228px; }
-}
-
-@media (max-width: 480px) {
-    .search__button { padding: 0 18px; }
-
-    .register-page { flex-direction: column; margin-top: 20px; gap: 24px; }
-
-    .register-block,
-    .log-in-block { width: 100%; border-radius: 20px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .movie-block,
-    .movie-block img,
-    .movie-block p,
-    .buttons button { transition: none; }
-}
-
-/* Styles for the profile markup (.profile, .profile__*, .movie-card).
-   Uses tokens from index.css. Everything is scoped under .profile so the
-   home page's horizontal .movie-list is not affected. */
-
+/* ============ 9. Profile — билет в кино ============ */
 .profile {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 0 var(--gutter) 64px;
+    padding: 20px var(--gutter) 64px;
 }
 
-/* ---------- Header: a cinema ticket ---------- */
 .profile__header {
     --stub: 200px;
     --notch: 14px;
@@ -533,7 +641,7 @@ header { max-width: 1371px; margin: 0 auto; }
             radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
 }
 
-/* tear-off line */
+/* линия отрыва */
 .profile__header::after {
     content: "";
     position: absolute;
@@ -588,7 +696,8 @@ header { max-width: 1371px; margin: 0 auto; }
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.profile__logout:hover {
+.profile__logout:hover,
+.profile__logout:active {
     background: var(--danger);
     border-color: var(--danger);
     color: var(--accent-ink);
@@ -596,7 +705,7 @@ header { max-width: 1371px; margin: 0 auto; }
 
 .profile__logout:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
-/* ---------- Favorites ---------- */
+/* Избранное */
 .profile__favorites { margin-top: 48px; }
 
 .profile__favorites h2 {
@@ -606,7 +715,7 @@ header { max-width: 1371px; margin: 0 auto; }
     letter-spacing: -0.02em;
 }
 
-/* Override the home page strip: here .movie-list is a normal grid */
+/* Здесь .movie-list — обычная сетка, а не лента с главной */
 .profile .movie-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -620,7 +729,6 @@ header { max-width: 1371px; margin: 0 auto; }
     mask-image: none;
 }
 
-/* ---------- Movie card ---------- */
 .movie-card {
     display: flex;
     flex-direction: column;
@@ -629,12 +737,7 @@ header { max-width: 1371px; margin: 0 auto; }
     border: 1px solid var(--edge);
     border-radius: 16px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
-}
-
-.movie-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 18px 44px var(--accent-glow), 0 6px 16px rgba(0, 0, 0, 0.6);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s ease;
 }
 
 .movie-card img {
@@ -674,10 +777,17 @@ header { max-width: 1371px; margin: 0 auto; }
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.movie-card button:hover { background: var(--danger); color: var(--accent-ink); }
+.movie-card button:hover,
+.movie-card button:active { background: var(--danger); color: var(--accent-ink); }
 .movie-card button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 
-/* ---------- Empty state ---------- */
+@media (hover: hover) and (pointer: fine) {
+    .movie-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 44px var(--accent-glow), 0 6px 16px rgba(0, 0, 0, 0.6);
+    }
+}
+
 .profile__empty {
     margin: 0;
     padding: 56px 20px;
@@ -688,90 +798,30 @@ header { max-width: 1371px; margin: 0 auto; }
     text-align: center;
 }
 
-/* ---------- Phones ---------- */
-@media (max-width: 640px) {
-    .profile__header {
-        grid-template-columns: 1fr;
-        justify-items: center;
-        gap: 16px;
-        padding: 28px 20px;
-        text-align: center;
-        -webkit-mask: none;
-        mask: none;
-    }
 
-    .profile__header::after { display: none; }
-
-    .profile__logout { justify-self: stretch; }
-
-    .profile .movie-list {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .movie-card,
-    .movie-card button,
-    .profile__logout { transition: none; }
-}
-
-.loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    padding: 48px var(--gutter);
-    color: var(--muted);
-    font-size: 14px;
-}
-.spinner {
-    width: 44px;
-    height: 44px;
-    border: 3px solid var(--edge);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    filter: drop-shadow(0 0 8px var(--accent-glow));
-    animation: spin 0.8s linear infinite;
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-.logo{
-    height: 60px;
-}
-.profile{
-    padding-top: 20px;
-}
-
-
-/* ============ Verify popup (изолированный блок) ============ */
-
+/* ============ 10. Verify popup ============ */
 /* Оверлей: затемняет страницу, блокирует клики, центрирует карточку */
 .verify-popup {
     position: fixed;
     inset: 0;
     z-index: 1000;
-
     display: flex;
     align-items: center;
     justify-content: center;
     padding: var(--gutter);
     overflow-y: auto;
-
+    overscroll-behavior: contain;
     background: rgba(10, 10, 16, 0.72);
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     animation: verify-fade 0.2s ease-out;
 }
 
-/* Карточка */
 .verify-popup__card {
     width: 100%;
     max-width: 380px;
     margin: auto;
     padding: 28px 24px 24px;
-
     color: var(--text);
     background:
             radial-gradient(260px 140px at 15% -10%, rgba(255, 122, 61, 0.14), transparent 70%),
@@ -810,14 +860,12 @@ header { max-width: 1371px; margin: 0 auto; }
     width: 100%;
     height: 52px;
     padding: 0 16px;
-
     font: inherit;
     font-size: 18px;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-align: center;
     color: var(--text);
-
     background: var(--bg);
     border: 1px solid var(--edge);
     border-radius: 12px;
@@ -840,12 +888,10 @@ header { max-width: 1371px; margin: 0 auto; }
     appearance: none;
     height: 50px;
     padding: 0 16px;
-
     font: inherit;
     font-size: 15px;
     font-weight: 800;
     color: var(--accent-ink);
-
     background: var(--accent);
     border: 0;
     border-radius: 12px;
@@ -854,17 +900,20 @@ header { max-width: 1371px; margin: 0 auto; }
     transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
-.verify-popup__button:hover {
+.verify-popup__button:hover:not(:disabled) {
     filter: brightness(1.08);
     box-shadow: 0 10px 30px var(--accent-glow);
 }
 
-.verify-popup__button:active { transform: translateY(1px); }
+.verify-popup__button:active:not(:disabled) { transform: translateY(1px); }
 
-.verify-popup__button:focus-visible {
-    outline: 2px solid var(--text);
-    outline-offset: 3px;
+.verify-popup__button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
 }
+
+.verify-popup__button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
 .verify-popup__error {
     margin: 14px 0 0;
@@ -888,9 +937,505 @@ header { max-width: 1371px; margin: 0 auto; }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .verify-popup,
-    .verify-popup__card { animation: none; }
-    .verify-popup__input,
-    .verify-popup__button { transition: none; }
+@keyframes verify-sheet {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
 }
+
+
+/* ==========================================================================
+   11. MOBILE
+   Всё ниже — только внутри media-запросов, десктоп не затрагивается.
+   Порядок важен: от большего брейкпоинта к меньшему.
+   ========================================================================== */
+
+/* ---------- Тач-устройства ---------- */
+@media (hover: none) and (pointer: coarse) {
+    * { -webkit-tap-highlight-color: transparent; }
+
+    button, a, input, .movie-block, .movie-card { touch-action: manipulation; }
+
+    /* живая реакция на нажатие вместо hover */
+    .movie-block,
+    .movie-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+
+    .movie-block:active,
+    .movie-card:active {
+        box-shadow: 0 6px 18px var(--accent-glow);
+    }
+
+    /* стрелки Swiper не нужны — свайпаем пальцем */
+    .swiper-button-next,
+    .swiper-button-prev { display: none; }
+}
+
+
+/* ---------- ≤ 768px: телефоны и небольшие планшеты ---------- */
+@media (max-width: 768px) {
+
+    :root {
+        --gutter: 14px;
+        --card-width: clamp(108px, 31vw, 150px);
+        --radius-card: 12px;
+    }
+
+    #root { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+
+    /* Header */
+    header {
+        padding-top: calc(8px + env(safe-area-inset-top));
+        padding-bottom: 8px;
+    }
+
+    .header_block { min-height: 48px; }
+    .header_block nav { gap: 12px; margin-left: auto; }
+
+    .logo { height: 36px; }
+    .logo-img { width: 34px; }
+
+    .register-img {
+        width: 38px;
+        height: 38px;
+        padding: 2px;
+    }
+
+    /* Page: у вложенных блоков свои отступы, поэтому у .page их нет */
+    .page { padding: 0 0 40px; }
+
+    .page__title {
+        margin: 16px 0 16px;
+        padding: 0 var(--gutter);
+        font-size: 20px;
+        line-height: 1.25;
+    }
+
+    .status { margin: 24px var(--gutter); font-size: 14px; }
+
+    /* Search на странице (не в шапке) */
+    .search {
+        max-width: none;
+        margin: 14px var(--gutter) 6px;
+        padding: 0;
+    }
+
+    .search__input {
+        height: 48px;
+        padding: 0 16px 0 46px;
+        font-size: 16px;                 /* ≥16px — иначе iOS зумит страницу при фокусе */
+        background-position: 16px center;
+    }
+
+    .search__input:focus { box-shadow: 0 0 0 3px var(--accent-glow); }
+
+    .search__button {
+        padding: 0 22px;
+        text-transform: capitalize;
+        box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    /* Trending */
+    .trending__header { margin-top: 20px; }
+
+    .trending__header h2,
+    .trending h2 { font-size: 22px; }
+
+    .buttons {
+        margin: 16px var(--gutter) 0;
+        padding: 3px;
+    }
+
+    .trending__header .buttons { margin: 0; }
+
+    .buttons button {
+        min-height: 36px;
+        padding: 6px 18px;
+    }
+
+    /* Лента */
+    .movie-list {
+        gap: 10px;
+        padding: 16px var(--gutter) 28px;
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+        mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+    }
+
+    .movie-block { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+
+    /* Название на постере: всегда видно, максимум 3 строки */
+    .movie-block p {
+        padding: 36px 9px 10px;
+        font-size: 12px;
+        line-height: 1.25;
+    }
+
+    /* Сетка */
+    .movies-grid,
+    .movie-cart {
+        grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+        gap: 10px;
+        padding: 0 var(--gutter);
+    }
+
+    /* Swiper: боковые отступы задаются slidesOffsetBefore/After, поэтому padding только по вертикали */
+    .swiper { padding: 14px var(--gutter) 28px; }
+    .swiper-button-next,
+    .swiper-button-prev { display: none; }
+
+    .loading { padding: 40px var(--gutter); }
+    .spinner { width: 36px; height: 36px; }
+}
+
+
+/* ---------- ≤ 640px: формы, профиль, попап, поиск в шапке ---------- */
+@media (max-width: 640px) {
+
+    /* --- Sign in / Log in --- */
+    .register-page {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+        margin-top: 0;
+        padding: 20px var(--gutter) 8px;
+    }
+
+    .register-block,
+    .log-in-block {
+        width: 100%;
+        max-width: none;
+        padding: 26px 20px 24px;
+        border-radius: 22px;
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .register-block h1,
+    .log-in-block h1 {
+        width: 100%;
+        margin: 0 0 22px;
+        font-size: 26px;
+        text-align: left;
+    }
+
+    .register-form { width: 100%; }
+
+    .register-form label { margin-bottom: 7px; }
+
+    .register-form input {
+        height: 52px;
+        margin-bottom: 16px;
+        padding: 0 16px;
+        font-size: 16px;                 /* без зума iOS */
+    }
+
+    .register-form button[type="submit"] {
+        height: 54px;
+        margin-top: 6px;
+        font-size: 16px;
+    }
+
+    .register-form button[type="submit"]:active {  }
+
+    .form-error,
+    .register-form p { margin: -4px 0 16px; line-height: 1.4; }
+
+
+    /* --- Profile: билет с отрывным корешком внизу --- */
+    .profile { padding: 16px var(--gutter) 48px; }
+
+    .profile__header {
+        --stub-h: 76px;
+        --notch: 12px;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-rows: auto var(--stub-h);
+        justify-items: stretch;
+        align-items: center;
+        gap: 20px 16px;
+        padding: 24px 20px 0;
+        text-align: left;
+        border-radius: 22px;
+
+        /* вырезы по бокам на линии отрыва */
+        -webkit-mask:
+                radial-gradient(circle var(--notch) at 0 calc(100% - var(--stub-h)), #0000 98%, #000) left / 51% 100% no-repeat,
+                radial-gradient(circle var(--notch) at 100% calc(100% - var(--stub-h)), #0000 98%, #000) right / 51% 100% no-repeat;
+        mask:
+                radial-gradient(circle var(--notch) at 0 calc(100% - var(--stub-h)), #0000 98%, #000) left / 51% 100% no-repeat,
+                radial-gradient(circle var(--notch) at 100% calc(100% - var(--stub-h)), #0000 98%, #000) right / 51% 100% no-repeat;
+    }
+
+    /* пунктир — горизонтальный */
+    .profile__header::after {
+        top: auto;
+        bottom: var(--stub-h);
+        left: var(--notch);
+        right: var(--notch);
+        height: 0;
+        border-left: 0;
+        border-top: 2px dashed var(--edge);
+    }
+
+    .profile__avatar { width: 72px; height: 72px; border-width: 2px; }
+
+    .profile__name { font-size: 24px; margin-bottom: 4px; }
+    .profile__email { font-size: 14px; }
+
+    .profile__logout {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        align-self: center;
+        height: 46px;
+        padding: 0 20px;
+        font-size: 15px;
+    }
+
+    .profile__favorites { margin-top: 32px; }
+    .profile__favorites h2 { font-size: 20px; margin-bottom: 16px; }
+
+    .profile .movie-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .movie-card { border-radius: 14px; }
+
+    .movie-card h3 {
+        margin: 12px 12px 3px;
+        font-size: 14px;
+        line-height: 1.25;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .movie-card p { margin: 0 12px 12px; font-size: 13px; }
+
+    .movie-card button {
+        min-height: 40px;                /* нормальная зона тапа */
+        margin: auto 12px 12px;
+    }
+
+    .profile__empty { padding: 40px 16px; border-radius: 18px; font-size: 14px; }
+
+
+    /* --- Verify popup: bottom sheet, как в нативных приложениях --- */
+    .verify-popup {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .verify-popup__card {
+        max-width: none;
+        margin: 0;
+        padding: 12px 20px calc(24px + env(safe-area-inset-bottom));
+        border-radius: 24px 24px 0 0;
+        border-bottom: 0;
+        max-height: 92vh;
+        max-height: 92dvh;
+        overflow-y: auto;
+        animation: verify-sheet 0.3s var(--ease);
+    }
+
+    /* «ручка» сверху шторки */
+    .verify-popup__card::before {
+        content: "";
+        display: block;
+        width: 40px;
+        height: 4px;
+        margin: 0 auto 18px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+    }
+
+    .verify-popup__title { margin-bottom: 18px; font-size: 18px; }
+    .verify-popup__email { font-size: 15px; }
+
+    .verify-popup__input {
+        height: 56px;
+        font-size: 22px;                 /* крупный код, без зума iOS */
+        letter-spacing: 0.3em;
+        border-radius: 14px;
+    }
+
+    .verify-popup__button { height: 54px; font-size: 16px; border-radius: 14px; }
+
+    .verify-popup__error { margin-top: 12px; }
+
+
+    /* --- Складывающийся поиск в шапке (чистый CSS, без JS) ---
+       Свёрнут: круглая кнопка-лупа рядом с иконкой входа.
+       Тап по лупе → фокус → поиск раскрывается на всю ширину шапки.
+       Остаётся раскрытым, пока в поле есть текст (кнопка Submit не исчезает до тапа).
+       Нужен placeholder на input — на нём работает :placeholder-shown. */
+
+    /* обёртка вокруг формы имеет inline-стили (padding-top: 10px, column) */
+    .header_block nav > div {
+        padding-top: 0 !important;
+        flex-direction: row !important;
+        align-items: center;
+    }
+
+    /* свёрнутое состояние */
+    .header_block .search {
+        width: 44px;
+        height: 44px;
+        margin: 0;
+        padding: 0;
+        gap: 0;
+    }
+
+    .header_block .search__input {
+        flex: none;
+        width: 44px !important;          /* перебиваем inline width: 80% */
+        height: 44px;
+        margin: 0 !important;            /* перебиваем inline margin: auto */
+        padding: 0;
+        color: transparent;
+        caret-color: transparent;
+        cursor: pointer;
+        background-position: center;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .header_block .search__input::placeholder { color: transparent; }
+    .header_block .search__button { display: none; }
+
+    /* раскрытое состояние */
+    .header_block .search:focus-within,
+    .header_block .search:has(.search__input:not(:placeholder-shown)) {
+        position: absolute;
+        z-index: 5;
+        top: 50%;
+        left: 0;
+        right: 0;
+        width: auto;
+        height: 48px;
+        gap: 8px;
+        transform: translateY(-50%);
+        border-radius: 999px;
+        background: var(--bg);           /* закрывает лого и иконку входа под собой */
+        animation: search-open 0.25s var(--ease);
+    }
+
+    .header_block .search:focus-within .search__input,
+    .header_block .search:has(.search__input:not(:placeholder-shown)) .search__input {
+        flex: 1 1 0;
+        width: auto !important;
+        min-width: 0;
+        height: 48px;
+        padding: 0 16px 0 46px;
+        color: var(--text);
+        caret-color: var(--accent);
+        cursor: text;
+        background-position: 16px center;
+    }
+
+    .header_block .search:focus-within .search__input::placeholder,
+    .header_block .search:has(.search__input:not(:placeholder-shown)) .search__input::placeholder {
+        color: var(--muted);
+    }
+
+    .header_block .search:focus-within .search__button,
+    .header_block .search:has(.search__input:not(:placeholder-shown)) .search__button {
+        display: block;
+        height: 48px;
+        padding: 0 18px;
+    }
+}
+
+@keyframes search-open {
+    from { opacity: 0; clip-path: inset(0 0 0 75% round 999px); }
+    to   { opacity: 1; clip-path: inset(0 0 0 0 round 999px); }
+}
+
+
+/* ---------- ≤ 480px: обычные телефоны ---------- */
+@media (max-width: 480px) {
+    .search__button { padding: 0 18px; }
+}
+
+
+/* ---------- ≤ 360px: iPhone SE и старые Android ---------- */
+@media (max-width: 360px) {
+
+    :root {
+        --gutter: 12px;
+        --card-width: clamp(100px, 33vw, 120px);
+    }
+
+    .logo { height: 30px; }
+    .header_block nav { gap: 10px; }
+
+    .search__button { padding: 0 14px; font-size: 14px; }
+
+    .movies-grid,
+    .movie-cart { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+
+    .profile__header { padding: 20px 16px 0; }
+    .profile__avatar { width: 60px; height: 60px; }
+    .profile__name { font-size: 21px; }
+
+    .register-block,
+    .log-in-block { padding: 22px 16px 20px; }
+
+    .register-block h1,
+    .log-in-block h1 { font-size: 23px; }
+
+    .movie-card h3 { font-size: 13px; }
+}
+
+
+/* ---------- Альбомная ориентация телефона ---------- */
+@media (max-height: 480px) and (orientation: landscape) {
+    header { position: static; }
+
+    .verify-popup { align-items: center; padding: 8px; }
+
+    .verify-popup__card {
+        max-width: 420px;
+        margin: auto;
+        max-height: 100dvh;
+        border-radius: 20px;
+        animation: verify-rise 0.25s ease-out;
+    }
+
+    .verify-popup__card::before { display: none; }
+}
+
+
+/* ============ 12. Reduced motion ============ */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    /* спиннер должен продолжать крутиться, иначе загрузка выглядит зависшей */
+    .spinner { animation-duration: 1.6s !important; animation-iteration-count: infinite !important; }
+}
+.movies-grid,
+.movie-cart {
+    grid-template-columns: repeat(auto-fill, var(--card-width));
+    justify-content: center;
+}
+:root { --content-width: 1350px; }
+
+.page,
+.trending,
+.movie-list,
+.swiper,
+.movies-grid,
+.movie-cart,
+.profile {
+    max-width: var(--content-width);
+    margin-inline: auto;
+}
+.trending, .movie-cart{
+    padding-top: 20px;
+}
+
