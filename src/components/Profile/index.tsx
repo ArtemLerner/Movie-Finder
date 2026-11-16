@@ -17,7 +17,6 @@ export default function Profile() {
     });
 
     const userImg = '../../../public/profile.svg';
-    console.log(user);
 
     async function handleLogOut(){
         try{

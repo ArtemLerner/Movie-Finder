@@ -354,7 +354,7 @@ header { max-width: 1371px; margin: 0 auto; }
 .search__button:focus-visible,
 .register-form button[type="submit"]:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
-/* ============ Register / Log in ============ */
+/* ============ Sign-in / Log in ============ */
 .register-page {
     display: flex;
     justify-content: center;
@@ -742,4 +742,155 @@ header { max-width: 1371px; margin: 0 auto; }
 }
 .profile{
     padding-top: 20px;
+}
+
+
+/* ============ Verify popup (изолированный блок) ============ */
+
+/* Оверлей: затемняет страницу, блокирует клики, центрирует карточку */
+.verify-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--gutter);
+    overflow-y: auto;
+
+    background: rgba(10, 10, 16, 0.72);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    animation: verify-fade 0.2s ease-out;
+}
+
+/* Карточка */
+.verify-popup__card {
+    width: 100%;
+    max-width: 380px;
+    margin: auto;
+    padding: 28px 24px 24px;
+
+    color: var(--text);
+    background:
+            radial-gradient(260px 140px at 15% -10%, rgba(255, 122, 61, 0.14), transparent 70%),
+            var(--surface);
+    border: 1px solid var(--edge);
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    animation: verify-rise 0.25s ease-out;
+}
+
+.verify-popup__title {
+    margin: 0 0 22px;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--text);
+    overflow-wrap: anywhere;
+}
+
+.verify-popup__email {
+    display: block;
+    margin-top: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.verify-popup__form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.verify-popup__input {
+    width: 100%;
+    height: 52px;
+    padding: 0 16px;
+
+    font: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-align: center;
+    color: var(--text);
+
+    background: var(--bg);
+    border: 1px solid var(--edge);
+    border-radius: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.verify-popup__input::placeholder {
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: normal;
+}
+
+.verify-popup__input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.verify-popup__button {
+    appearance: none;
+    height: 50px;
+    padding: 0 16px;
+
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--accent-ink);
+
+    background: var(--accent);
+    border: 0;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px var(--accent-glow);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.verify-popup__button:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 10px 30px var(--accent-glow);
+}
+
+.verify-popup__button:active { transform: translateY(1px); }
+
+.verify-popup__button:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 3px;
+}
+
+.verify-popup__error {
+    margin: 14px 0 0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255, 77, 77, 0.12);
+    border: 1px solid rgba(255, 77, 77, 0.3);
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+@keyframes verify-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes verify-rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .verify-popup,
+    .verify-popup__card { animation: none; }
+    .verify-popup__input,
+    .verify-popup__button { transition: none; }
 }

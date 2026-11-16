@@ -1,10 +1,10 @@
-import Register from "../../components/Register/Register.tsx";
+import SignIn from "../../components/Sign-in/Sign-in.tsx";
 
 export default function RegisterPage(){
 
     return(
         <>
-            <Register/>
+            <SignIn/>
         </>
     )
 }

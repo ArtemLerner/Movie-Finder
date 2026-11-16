@@ -2,10 +2,10 @@ import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../context/AuthContext.tsx";
 import Loading from "../Loading/Loading.tsx";
-import SignIn from "../Popup/sign-in.tsx";
+import SignInPopup from "../Popup/sign-in.popup.tsx";
 import type {User} from "../../share/types/User.ts";
 
-export default function Register() {
+export default function SignIn() {
 
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -33,6 +33,7 @@ export default function Register() {
 
     const [loadingReg, setLoadingReg] = useState(false);
     const [loadingLog, setLoadingLog] = useState(false);
+    const [LoadingPop, setLoadingPop] = useState(false);
 
 
     // Обработка и проверка формы РЕГИСТРАЦИИ
@@ -63,31 +64,29 @@ export default function Register() {
         // Если все проверки пройдены — отправляем данные на сервер
 
 
-        setPopup(true);
 
         try {
-            // setLoadingReg(true);
-            // const res = await fetch(`${SERVER_URL}/auth/register`, {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({email: regEmail, password: regPassword})
-            // }).finally(()=>setLoadingReg(false))
-            //
-            // const data = await res.json();
-            // if (res.ok) {
-            //     setUser(data);
-            //
-            // }else {
-            //     setRegError("Email already exists!");
-            // }
+            setLoadingReg(true);
+            const res = await fetch(`${SERVER_URL}/auth/register`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({email: regEmail, password: regPassword})
+            }).finally(()=>setLoadingReg(false))
+
+            const data = await res.json()
+
+            if (res.ok) {
+                setPopup(true);
+                console.log(data.email_token)
+            }else {
+                setRegError("Email already exists!");
+            }
         }catch(err) {
             console.log(err);
         }
-
-
     }
 
-    // Обработка и проверка формы ВХОДА
     async function handleLoginSubmit(e: React.FormEvent) {
         e.preventDefault();
 
@@ -118,22 +117,44 @@ export default function Register() {
         }
     }
 
-    const handleTokenSet = (token: string) => {
-        console.log("token", token);
+    async function handleToken (token: string): Promise<boolean> {
+        try{
+            setLoadingPop(true);
+            const res = await fetch(`${SERVER_URL}/auth/verify-e`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({email: regEmail, token})
+            }).finally(()=>setLoadingPop(false))
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setLoadingPop(false);
+                    setUser(data);
+                    nav('/profile');
+                    return true
+            }else{
+                return false;
+            }
+
+        }catch(err) {
+            console.log(err);
+            return false;
+        }
     }
 
 
-    return (
 
+
+    return (
         <div className={'register-page'}>
             {/* Блок регистрации */}
             <div className={'register-block'}>
                 <h1>Register</h1>
                 {loadingReg ? <Loading/> :
-                    <form title={"Register"} className={'register-form'}
+                    <form title={"SignIn"} className={'register-form'}
                           onSubmit={handleRegisterSubmit} noValidate>
-                        {popup &&
-                            <SignIn user={{ email: regEmail } as User} verify={handleTokenSet}/>}
 
                         <label>email:</label>
                         <input
@@ -162,6 +183,10 @@ export default function Register() {
                         <button type={"submit"}>submit</button>
                     </form>
                 }
+                {
+                    LoadingPop ? <Loading /> :
+                    popup &&
+                    <SignInPopup user={{ email: regEmail } as User} verify={handleToken}/>}
             </div>
 
             {/* Блок входа */}

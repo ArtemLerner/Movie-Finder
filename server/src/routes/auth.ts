@@ -2,7 +2,7 @@ import express ,{Router} from "express";
 import {pool} from "../db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import { v4 as uuidv4 } from "uuid";
 
 const router = Router();
 
@@ -23,13 +23,17 @@ router.post('/register', async (req, res) => {
 
 
     if (!user) {
+        const emailToken = uuidv4().slice(0, 6);
+
+
         const newUser = await pool.query(
-            `INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email`,
-            [email, passHash]
+            `INSERT INTO users (email, password, email_token) 
+                            VALUES ($1, $2, $3) RETURNING id, email, email_token`,
+            [email, passHash, emailToken]
         )
         const user = newUser.rows[0];
-        setAuthCookie(res, user.id);
-        return res.json({ id: user.id, email: user.email});
+
+        return res.json({ id: user.id, email: user.email, email_token: user.email_token });
     }else {
         return res.status(401).json({ error: "email is already in use" });
     }
@@ -95,6 +99,32 @@ router.get('/me', async (req, res) => {
     }
 })
 
+router.post('/verify-e', async (req, res) => {
+    const {email, token} = req.body;
+
+
+        try{
+            const emailTokenSaveBD = await pool.query(
+                `UPDATE users 
+                                SET email_verified = true, email_token = NULL
+                                WHERE email = $1 AND email_token = $2
+                                RETURNING id, email, email_verified`,
+                [email, token]
+            );
+
+            const user = emailTokenSaveBD.rows[0];
+
+
+             if (!user) {
+                 res.status(401).json({ message: "Invalid email or password" });
+             }
+
+            setAuthCookie(res, user.id);
+            res.status(200).json({ user });
+        }catch{
+            res.status(401).json({ message: "Invalid email or password" });
+        }
+})
 
 
 function setAuthCookie(res: express.Response, userId: number) {
