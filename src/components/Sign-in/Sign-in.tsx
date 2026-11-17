@@ -33,7 +33,6 @@ export default function SignIn() {
 
     const [loadingReg, setLoadingReg] = useState(false);
     const [loadingLog, setLoadingLog] = useState(false);
-    const [LoadingPop, setLoadingPop] = useState(false);
 
 
     // Обработка и проверка формы РЕГИСТРАЦИИ
@@ -120,18 +119,16 @@ export default function SignIn() {
 
     async function handleToken (token: string): Promise<boolean> {
         try{
-            setLoadingPop(true);
             const res = await fetch(`${SERVER_URL}/auth/verify-e`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({email: regEmail, token})
-            }).finally(()=>setLoadingPop(false))
+            })
 
             const data = await res.json();
 
             if (res.ok) {
-                setLoadingPop(false);
                     setUser(data);
                     nav('/profile');
                 setPopup(false);
