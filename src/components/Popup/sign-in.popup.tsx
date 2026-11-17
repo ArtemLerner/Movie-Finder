@@ -37,9 +37,14 @@ export default function SignInPopup({user, verify}: SignInPopup) {
                         onChange={(e) => setToken(e.target.value)}
                         autoFocus
                     />
-                    <button className="verify-popup__button" type="submit">
-                        Verify
-                    </button>
+                    <div className="buttons-verify">
+                        <button className="verify-popup__button" type="submit">
+                            Verify
+                        </button>
+                        <button className="cancel-popup__button verify-popup__button" type="submit">
+                            Cancel
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

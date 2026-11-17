@@ -107,11 +107,13 @@ export default function SignIn() {
                 setUser(data);
                 nav("/profile");
             } else {
+                setPopup(false);
                 console.log(data.message);
                 setLoginError(data.message);
             }
 
         } catch (err) {
+            setPopup(false);
             setLoginError("Не удалось связаться с сервером.");
         }
     }
@@ -132,16 +134,22 @@ export default function SignIn() {
                 setLoadingPop(false);
                     setUser(data);
                     nav('/profile');
-                    return true
+                setPopup(false);
+                return true
+
             }else{
                 console.log(data.message);
+                setPopup(false);
+
                 return false;
             }
+
 
         }catch(err) {
             console.log(err);
             return false;
         }
+
     }
 
 
@@ -184,7 +192,7 @@ export default function SignIn() {
                     </form>
                 }
                 {
-                    LoadingPop ? <Loading /> :
+
                     popup &&
                     <SignInPopup user={{ email: regEmail } as User} verify={handleToken}/>}
             </div>

@@ -1439,3 +1439,17 @@ header {
     padding-top: 20px;
 }
 
+.buttons-verify{
+    display: flex;
+    justify-content: space-between;
+}
+.buttons-verify button{
+    width: 48%;
+}
+.cancel-popup__button{
+    background-color: grey;
+    color: white;
+}
+.cancel-popup__button{
+
+}
