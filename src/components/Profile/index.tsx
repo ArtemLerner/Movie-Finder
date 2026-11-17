@@ -2,6 +2,7 @@ import {useAuth} from "../../context/AuthContext.tsx";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Loading from "../Loading/Loading.tsx";
+import MovieCart from "../MovieCart/MovieCart.tsx";
 
 export default function Profile() {
     const {user, setUser} = useAuth();
@@ -9,6 +10,7 @@ export default function Profile() {
 
     const [loading, setLoading] = useState(false);
 
+    const data: string[] = [''];
 
     const VITE_URL = import.meta.env.VITE_URL;
 
@@ -51,24 +53,13 @@ export default function Profile() {
 
                         <section className="profile__favorites">
                             <h2>Favorite movies</h2>
-
+                            {data.length === 0 ?
                             <ul className="movie-list">
-                                <li className="movie-card">
-                                    <img src="poster.jpg" alt="Movie poster"/>
-                                    <h3>Fight Club</h3>
-                                    <p>1999 · ⭐ 8.4</p>
-                                    <button type="button">Remove</button>
-                                </li>
-
-                                <li className="movie-card">
-                                    <img src="poster2.jpg" alt="Movie poster"/>
-                                    <h3>Inception</h3>
-                                    <p>2010 · ⭐ 8.8</p>
-                                    <button type="button">Remove</button>
-                                </li>
+                                {/*<MovieCart data={}/>*/}
                             </ul>
-
+                            :
                             <p className="profile__empty">You have no favorite movies yet.</p>
+                            }
                         </section>
                 </>
             }
