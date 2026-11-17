@@ -35,3 +35,18 @@ export async function SearchMovies(query: string) {
     }
 }
 
+export async function MovieDetails(movieId: string, type :MediaType) {
+    try{
+        const response = await fetch(
+            `${BASE}${type}/${movieId}?language=en-US&append_to_response=credits,videos`, {
+                headers: { Authorization: `Bearer ${TMDB_TOKENT}` },
+            });
+        const data = await response.json();
+        console.log(data);
+        return data;
+
+    }catch (error){
+        console.error('MovieDetails error');
+    }
+
+}

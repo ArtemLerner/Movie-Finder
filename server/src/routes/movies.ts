@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {Movie, SearchMovies} from "../services/tmdb"
+import {Movie, MovieDetails, SearchMovies} from "../services/tmdb"
 
 const router = Router();
 
@@ -37,5 +37,23 @@ router.get("/search", async (req, res) => {
     }
 })
 
+
+router.get("/:type/:id", async (req, res) => {
+    const { type, id } = req.params;
+
+    if (typeof id !== "string" || !id.trim()) {
+        return res.status(400).json({ error: "id is required" });
+    }
+
+    if (type !== 'movie' && type !== 'tv') {
+        return res.status(400).json({ error: 'type must be movie or tv' });
+    }
+
+    if (typeof type !== "string" || !id.trim()) {
+        return res.status(400).json({ error: "id is required" });
+    }
+
+    res.json({results: await MovieDetails(id, type) });
+})
 
 export default router;

@@ -15,8 +15,7 @@ export default function MovieCart({data, swiper}: PropsMovie) {
     return (
         <div className="movie-block" key={data.id}>
                 <Link
-                    to={`https://uakinogo.io/search/${encodeURIComponent(title ? title: '')}`}
-                    target="_blank"
+                    to={`/${data.media_type}/${data.id}`}
                     rel="noreferrer"
                 >
                 <p>{title}</p>

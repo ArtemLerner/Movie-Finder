@@ -2,7 +2,6 @@ import {useAuth} from "../../context/AuthContext.tsx";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Loading from "../Loading/Loading.tsx";
-import MovieCart from "../MovieCart/MovieCart.tsx";
 
 export default function Profile() {
     const {user, setUser} = useAuth();
