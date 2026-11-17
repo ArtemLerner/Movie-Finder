@@ -35,7 +35,7 @@ export async function SearchMovies(query: string) {
     }
 }
 
-export async function MovieDetails(movieId: string, type :MediaType) {
+export async function FindByID(movieId: string, type :MediaType) {
     try{
         const response = await fetch(
             `${BASE}${type}/${movieId}?language=en-US&append_to_response=credits,videos`, {

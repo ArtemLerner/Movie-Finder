@@ -115,7 +115,7 @@ router.get('/me', async (req, res) => {
     if(!SECRET) return
 
     if (!token) {
-        return res.status(401).json({ message: "Not logged in" });
+        return res.status(400).json({ message: "Not logged in" });
     }
 
     try{

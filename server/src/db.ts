@@ -17,7 +17,6 @@ export async function cleanupPending() {
 
 export default async function initDB() {
     await pool.query(`
-
         CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
             email VARCHAR(255) UNIQUE NOT NULL,
@@ -25,6 +24,14 @@ export default async function initDB() {
             email_verified BOOLEAN NOT NULL DEFAULT false,
             email_token TEXT
         );
+
+        CREATE TABLE IF NOT EXISTS favorites (
+            id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            tmdb_id TEXT NOT NULL,
+            media_type TEXT CHECK (media_type IN ('movie', 'tv')),
+            PRIMARY KEY (id, tmdb_id, media_type)
+        );
+
         CREATE TABLE IF NOT EXISTS users_pending (
             id SERIAL PRIMARY KEY,
             email VARCHAR(255) UNIQUE NOT NULL,
