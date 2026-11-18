@@ -17,7 +17,7 @@ export default function SignIn() {
         if(user){
             nav('/profile', {replace: true});
         }
-    });
+    }, [user, nav]);
 
     const [regEmail, setRegEmail] = useState("");
     const [regPassword, setRegPassword] = useState("");
@@ -33,7 +33,9 @@ export default function SignIn() {
 
     const [loadingReg, setLoadingReg] = useState(false);
     const [loadingLog, setLoadingLog] = useState(false);
+    const [loadingPop, setLoadingPop] = useState(false);
 
+    const [toast, setToast] = useState(false);
 
     // Обработка и проверка формы РЕГИСТРАЦИИ
     async function handleRegisterSubmit(e: React.FormEvent) {
@@ -119,6 +121,7 @@ export default function SignIn() {
 
     async function handleToken (token: string): Promise<boolean> {
         try{
+            setLoadingPop(true);
             const res = await fetch(`${SERVER_URL}/auth/verify-e`, {
                 method: "POST",
                 credentials: "include",
@@ -129,19 +132,18 @@ export default function SignIn() {
             const data = await res.json();
 
             if (res.ok) {
-                    setUser(data);
-                    nav('/profile');
                 setPopup(false);
-                return true
+                setToast(true);
+                setRegEmail('')
+                setRegPassword('')
+                setRegConfirmPassword('')
 
+                return true
             }else{
                 console.log(data.message);
                 setPopup(false);
-
                 return false;
             }
-
-
         }catch(err) {
             console.log(err);
             return false;
@@ -153,6 +155,8 @@ export default function SignIn() {
 
 
     return (
+        <>
+
         <div className={'register-page'}>
             {/* Блок регистрации */}
             <div className={'register-block'}>
@@ -190,8 +194,10 @@ export default function SignIn() {
                 }
                 {
 
-                    popup &&
-                    <SignInPopup user={{ email: regEmail } as User} verify={handleToken}/>}
+                    popup && !loadingPop &&
+                    <SignInPopup user={{ email: regEmail } as User} verify={handleToken}/>
+
+                }
             </div>
 
             {/* Блок входа */}
@@ -221,7 +227,18 @@ export default function SignIn() {
                     </form>
                 }
             </div>
-
         </div>
+            {toast ?
+                <div className={'register-cart'}>
+                    <div className="success-card">
+                        <div className="success-icon">✓</div>
+                        <h1>Registration successful!</h1>
+                        <p>Your account has been created. You can now log in.</p>
+                        <button onClick={() => setToast(false)}>Log in</button>
+                    </div>
+                </div>
+                : ''}
+        </>
     );
+
 }

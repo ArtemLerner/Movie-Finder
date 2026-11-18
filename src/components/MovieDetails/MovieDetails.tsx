@@ -1,7 +1,8 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, type ButtonHTMLAttributes} from "react";
 import type { MovieDetailsType} from "../../share/types/MovieCart.ts";
 import '../MovieDetails/profile-module.css'
 import Loading from "../Loading/Loading.tsx";
+import {useAuth} from "../../context/AuthContext.tsx";
 
 type Props = {
     type: string | undefined;
@@ -10,9 +11,10 @@ type Props = {
 const URL = import.meta.env.VITE_URL;
 
 export default  function MovieDetails({type, data}: Props){
+    const [favoriteMovie, setFavorite] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(true);
     const [movie, setMovie] = useState<MovieDetailsType | null>(null);
-
+    const {user} = useAuth();
 
     useEffect(() => {
         if (!type || !data) return;
@@ -24,12 +26,9 @@ export default  function MovieDetails({type, data}: Props){
                 }).finally(()=>setLoading(false));
 
                 const dataRes = await res.json();
-
-                console.log(dataRes);
                 setMovie(dataRes.results)
-
             }catch(err){
-                console.log("error fetch node", err);
+                console.log(err);
             }
         }
 
@@ -42,6 +41,49 @@ export default  function MovieDetails({type, data}: Props){
         <Loading/>
     )
     if (!movie) return null;
+
+
+    async function handleAddFavorite(e: React.MouseEvent<HTMLButtonElement>){
+        if(!user) return
+
+        const email = user.email;
+        try {
+            const res = await fetch(`${URL}/api/favorite`,{
+                method: "POST",
+                credentials: "include",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({emailUser: email, type, id: data})
+            })
+
+            const dataRes = await res.json();
+            setFavorite(false);
+
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    async function handleRemoveFavorite(e: React.MouseEvent<HTMLButtonElement>){
+        if(!user) return
+
+        const email = user.email;
+        try {
+            const res = await fetch(`${URL}/api/favorite-del`,{
+                method: "POST",
+                credentials: "include",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({emailUser: email, type, id: data})
+            })
+
+            const dataRes = await res.json();
+            setFavorite(true)
+
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+
 
     return (
         <div className="movie">
@@ -77,7 +119,14 @@ export default  function MovieDetails({type, data}: Props){
 
                     <div className="movie__actions">
                         <button className="movie__btn movie__btn--primary">Смотреть</button>
-                        <button className="movie__btn">В избранное</button>
+
+                        <button
+                            className={favoriteMovie ? "movie__btn__del" : "movie__btn"}
+                            onClick={favoriteMovie ? handleRemoveFavorite : handleAddFavorite}
+                        >
+                            {favoriteMovie ? 'Уже в избранном' : 'В избранное'}
+                        </button>
+
                     </div>
                 </div>
             </div>

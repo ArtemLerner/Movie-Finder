@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {FindByID, Movie, SearchMovies} from "../services/tmdb"
+import {FindByID, MediaType, Movie, SearchMovies} from "../services/tmdb"
 import {pool} from "../db";
 
 const router = Router();
@@ -84,18 +84,47 @@ router.post("/get-favorite", async (req, res) => {
     if(user.rows[0] !== 0){
 
         const userID = user.rows[0]?.id
-    //     TODO
-    //      parse all favorite table for ID user where EMAIL = email
+
             const data = await pool.query(`
             SELECT * FROM favorites WHERE id = $1`, [userID])
 
-            if(data.rows.length > 0){
-                res.status(200).json({movies: data.rows})
+            const type: MediaType[] = data.rows.map(type => type.media_type)
+            const movieId: string[] = data.rows.map(id => id.tmdb_id)
+
+
+            if(data.rows[0] !== 0){
+                const dataMovies = await Promise.all(
+                    data.rows.map(item => FindByID(item.tmdb_id, item.media_type))
+                )
+                res.status(200).json({movies: dataMovies});
+            }else{
+                res.status(400).json({ error: data.rows })
             }
+    }else{
+        res.status(400).json({ error: 'email is required' })
     }
 })
 
 
+router.post("/favorite-del", async (req, res) => {
+    const {emailUser, type, id } = req.body;
+
+    if (type !== 'movie' && type !== 'tv') {
+        return res.status(400).json({ error: 'type must be movie or tv' });
+    }
+
+    const resPool = await pool.query(
+        `
+        DELETE FROM favorites 
+        WHERE id = (SELECT id FROM users WHERE email = $1)
+          AND tmdb_id = $2
+          AND media_type = $3
+        `, [emailUser, id, type])
+
+    if(resPool.rowCount === 0){
+        res.status(400).json({ error: 'email is required' })
+    }
+})
 
 
 export default router;

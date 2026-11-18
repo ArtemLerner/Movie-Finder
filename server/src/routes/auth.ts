@@ -74,8 +74,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-
-
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -168,7 +166,6 @@ router.post('/verify-e', async (req, res) => {
 
                  const user = result.rows[0];
 
-                 setAuthCookie(res, user.id);
                  res.status(200).json({ user });
              }
 

@@ -1453,3 +1453,98 @@ header {
 .cancel-popup__button{
 
 }
+
+/* Оверлей: затемнение + центр */
+.register-cart {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--gutter);
+    background: var(--glass);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: fade-in 0.25s var(--ease);
+}
+
+/* Карточка */
+.success-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--edge-strong);
+    border-radius: var(--radius-card);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55),
+    0 0 40px var(--accent-glow);
+    animation: pop-in 0.35s var(--ease);
+}
+
+/* Иконка-галочка */
+.success-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--accent-ink);
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 24px var(--accent-glow);
+}
+
+.success-card h1 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    color: var(--text);
+}
+
+.success-card p {
+    margin: 0 0 24px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--muted);
+}
+
+/* Кнопка */
+.success-card button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-ink);
+    background: var(--accent);
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.success-card button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+.success-card button:active {
+    transform: translateY(0);
+}
+
+/* Анимации */
+@keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.92)
+    }
+}

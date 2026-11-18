@@ -38,11 +38,13 @@ export async function SearchMovies(query: string) {
 export async function FindByID(movieId: string, type :MediaType) {
     try{
         const response = await fetch(
-            `${BASE}${type}/${movieId}?language=en-US&append_to_response=credits,videos`, {
+            `${BASE}${type}/${movieId}?language=en-US`, {
                 headers: { Authorization: `Bearer ${TMDB_TOKENT}` },
             });
         const data = await response.json();
-        console.log(data);
+
+        data.media_type = type;
+        data.id = movieId;
         return data;
 
     }catch (error){
