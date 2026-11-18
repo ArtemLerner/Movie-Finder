@@ -38,8 +38,10 @@ export default function Profile() {
         }
     }
     useEffect(()=>{
+        if(!user) return;
+        const email = user?.email
+
         async function handleLogout(){
-            const email = user?.email
             try{
                 setLoading(true);
                 const res = await fetch(`${VITE_URL}/api/get-favorite`,{
@@ -50,21 +52,15 @@ export default function Profile() {
                 })
                 const data = await res.json();
 
-                if(res.ok){
-                    setFavorites(data.movies);
-                    setLoading(false);
-
-                }else{
-                    console.log(data.error);
-                }
+                setFavorites(data.movies);
+                setLoading(false);
 
             }catch (error) {
-                console.log(error);
             }
 
         }
         handleLogout();
-    },[])
+    },[user])
 
     return (
         <main className="profile">

@@ -65,7 +65,9 @@ router.post("/favorite", async (req, res) => {
         `
         INSERT INTO favorites (id, tmdb_id,media_type)
         SELECT id, $2, $3 FROM users WHERE email = $1
+        ON CONFLICT DO NOTHING
         `, [emailUser, id, type])
+    res.status(200).json({ ok: true });
 
     if(resPool.rowCount === 0){
         res.status(400).json({ error: 'email is required' })
@@ -91,8 +93,7 @@ router.post("/get-favorite", async (req, res) => {
             const type: MediaType[] = data.rows.map(type => type.media_type)
             const movieId: string[] = data.rows.map(id => id.tmdb_id)
 
-
-            if(data.rows[0] !== 0){
+            if(data.rows.length !== 0){
                 const dataMovies = await Promise.all(
                     data.rows.map(item => FindByID(item.tmdb_id, item.media_type))
                 )
@@ -115,12 +116,14 @@ router.post("/favorite-del", async (req, res) => {
 
     const resPool = await pool.query(
         `
-        DELETE FROM favorites 
-        WHERE id = (SELECT id FROM users WHERE email = $1)
-          AND tmdb_id = $2
-          AND media_type = $3
-        `, [emailUser, id, type])
+            DELETE FROM favorites
+            WHERE id = (SELECT id FROM users WHERE email = $1)
+           AND tmdb_id = $2
+           AND media_type = $3`,
+        [emailUser, String(id), type]
+    );
 
+    res.status(200).json({ ok: true });
     if(resPool.rowCount === 0){
         res.status(400).json({ error: 'email is required' })
     }

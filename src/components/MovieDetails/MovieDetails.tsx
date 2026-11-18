@@ -11,7 +11,7 @@ type Props = {
 const URL = import.meta.env.VITE_URL;
 
 export default  function MovieDetails({type, data}: Props){
-    const [favoriteMovie, setFavorite] = useState<boolean>(false)
+    const [favorites, setFavorites] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [movie, setMovie] = useState<MovieDetailsType | null>(null);
     const {user} = useAuth();
@@ -32,15 +32,62 @@ export default  function MovieDetails({type, data}: Props){
             }
         }
 
+
         void loadMovies();
 
 
-    }, [type, data])
+
+    }, [type, data, user])
+
+    useEffect(()=>{
+        console.log("effect run", user);
+
+        async function getAllFavoriteMovies(){
+
+            if(!user) return  console.log("No user found");
+
+            const email = user?.email;
+            try{
+                const res = await fetch(`${URL}/api/get-favorite`,{
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    credentials: "include",
+                    body: JSON.stringify({email})
+                })
+                const dataRes = await res.json();
+
+
+                if(res.ok){
+                    console.log(dataRes.movies);
+                    setFavorites(dataRes.movies)
+                }else{
+                    console.log(dataRes.error)
+                }
+            }catch (err){
+                console.log(err);
+            }
+        }
+        void getAllFavoriteMovies()
+
+    },[user])
+    const isFavorite = favorites.some(
+        m => String(m.id) === data && m.media_type === type
+    );
+
 
     if (loading) return (
         <Loading/>
     )
     if (!movie) return null;
+
+
+
+
+ // TODO 1.get-favorit fetch -> nav check ? setFavorite(true) : false
+ //      2.fix: find the token
+
+
+
 
 
     async function handleAddFavorite(e: React.MouseEvent<HTMLButtonElement>){
@@ -56,7 +103,10 @@ export default  function MovieDetails({type, data}: Props){
             })
 
             const dataRes = await res.json();
-            setFavorite(false);
+
+            if (res.ok) {
+                setFavorites(prev => [...prev, { id: Number(data), media_type: type }]);
+            }
 
         }catch(err){
             console.log(err);
@@ -76,8 +126,10 @@ export default  function MovieDetails({type, data}: Props){
             })
 
             const dataRes = await res.json();
-            setFavorite(true)
 
+            setFavorites(prev =>
+                prev.filter(m => !(String(m.id) === data && m.media_type === type))
+            );
         }catch(err){
             console.log(err);
         }
@@ -121,10 +173,10 @@ export default  function MovieDetails({type, data}: Props){
                         <button className="movie__btn movie__btn--primary">Смотреть</button>
 
                         <button
-                            className={favoriteMovie ? "movie__btn__del" : "movie__btn"}
-                            onClick={favoriteMovie ? handleRemoveFavorite : handleAddFavorite}
+                            className={isFavorite ? "movie__btn__del" : "movie__btn"}
+                            onClick={isFavorite ? handleRemoveFavorite : handleAddFavorite}
                         >
-                            {favoriteMovie ? 'Уже в избранном' : 'В избранное'}
+                            {isFavorite ? 'Уже в избранном' : 'В избранное'}
                         </button>
 
                     </div>

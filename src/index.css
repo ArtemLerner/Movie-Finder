@@ -1548,3 +1548,29 @@ header {
         transform: scale(0.92)
     }
 }
+.movie__btn__del {
+    height: 48px;
+    padding: 0 26px;
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    background: rgba(255, 122, 61, 0.12);
+    color: var(--accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.25s var(--ease),
+    background 0.25s var(--ease),
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+
+.movie__btn__del:hover {
+    background: rgba(255, 107, 107, 0.14);
+    border-color: var(--danger);
+    color: var(--danger);
+    transform: translateY(-1px);
+}
+
+.movie__btn__del:active {
+    transform: translateY(0);
+}
