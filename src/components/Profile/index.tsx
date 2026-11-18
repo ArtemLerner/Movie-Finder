@@ -6,15 +6,15 @@ import MovieCart from "../MovieCart/MovieCart.tsx";
 import {Navigation} from "swiper/modules";
 import {Swiper, SwiperSlide} from "swiper/react";
 import type SwiperType from "swiper";
+import type {MovieDetailsType} from "../../share/types/MovieCart.ts";
 
 export default function Profile() {
     const {user, setUser} = useAuth();
     const nav = useNavigate();
-    const [favorites, setFavorites] = useState([]);
+    const [favorites, setFavorites] = useState<MovieDetailsType[]>([]);
     const [loading, setLoading] = useState(false);
     const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
 
-    const data: string[] = [''];
 
     const VITE_URL = import.meta.env.VITE_URL;
 

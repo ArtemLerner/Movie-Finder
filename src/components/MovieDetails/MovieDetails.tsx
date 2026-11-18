@@ -1,4 +1,4 @@
-import {useState, useEffect, type ButtonHTMLAttributes} from "react";
+import {useState, useEffect} from "react";
 import type { MovieDetailsType} from "../../share/types/MovieCart.ts";
 import '../MovieDetails/profile-module.css'
 import Loading from "../Loading/Loading.tsx";
@@ -90,7 +90,7 @@ export default  function MovieDetails({type, data}: Props){
 
 
 
-    async function handleAddFavorite(e: React.MouseEvent<HTMLButtonElement>){
+    async function handleAddFavorite(){
         if(!user) return
 
         const email = user.email;
@@ -102,8 +102,6 @@ export default  function MovieDetails({type, data}: Props){
                 body: JSON.stringify({emailUser: email, type, id: data})
             })
 
-            const dataRes = await res.json();
-
             if (res.ok) {
                 setFavorites(prev => [...prev, { id: Number(data), media_type: type }]);
             }
@@ -113,7 +111,7 @@ export default  function MovieDetails({type, data}: Props){
         }
     }
 
-    async function handleRemoveFavorite(e: React.MouseEvent<HTMLButtonElement>){
+    async function handleRemoveFavorite(){
         if(!user) return
 
         const email = user.email;
@@ -124,9 +122,7 @@ export default  function MovieDetails({type, data}: Props){
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({emailUser: email, type, id: data})
             })
-
-            const dataRes = await res.json();
-
+            if (!res.ok) return
             setFavorites(prev =>
                 prev.filter(m => !(String(m.id) === data && m.media_type === type))
             );
