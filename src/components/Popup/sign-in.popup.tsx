@@ -30,9 +30,8 @@ export default function SignInPopup({user, verify}: SignInPopup) {
                     <input
                         className="verify-popup__input"
                         type="text"
-                        inputMode="numeric"
-                        maxLength={6}
-                        placeholder="000000"
+                        maxLength={8}
+                        placeholder="00000000"
                         value={token}
                         onChange={(e) => setToken(e.target.value)}
                         autoFocus

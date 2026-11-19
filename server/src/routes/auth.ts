@@ -164,7 +164,7 @@ router.post('/verify-e',limit, async (req: express.Request, res: express.Respons
                      `WITH moved AS (
                      DELETE FROM users_pending
                      WHERE email = $1
-                       AND created_at > now() - interval '30 minutes'
+                       AND created_at > now() - interval '10 minutes'
                          RETURNING email, password
                          )
                      INSERT INTO users (email, password, email_verified)
@@ -225,12 +225,12 @@ export async function isAuth(req: express.Request, res: express.Response, next: 
 
         if(!user) res.status(401).json({ message: "User not found" });
 
+        res.locals.user = user;
+        next();
     }catch{
         res.status(401).json({ message: "Invalid auth" });
     }
 
-    res.locals.user = user;
-    next();
 }
 
 

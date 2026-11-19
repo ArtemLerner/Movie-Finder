@@ -15,10 +15,9 @@ export function Router() {
                 <Routes>
                     <Route path="/" element={<HomePage/>} />
                     <Route path="/:type/:id" element={<MovieDetailsPage/>} />
-                    <Route path="/search" element={<SearchPage/>} />
+                    <Route path="/search" element={<SearchPage/>}/>
+                    <Route path="/profile" element={<ProtectedRouter><Profile/></ProtectedRouter>}/>
                     <Route path="/register" element={<GuestRouter><RegisterPage/></GuestRouter>} />
-                    <Route path="/profile" element={<ProtectedRouter><Profile/></ProtectedRouter>}
-                    />
                 </Routes>
             </BrowserRouter>
     )

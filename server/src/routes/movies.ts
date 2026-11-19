@@ -50,8 +50,11 @@ router.get("/:type/:id", async (req, res) => {
     if (typeof type !== "string" || !id.trim()) {
         return res.status(400).json({ error: "id is required" });
     }
-
-    res.json({results: await FindByID(id, type) });
+    try{
+        res.json({results: await FindByID(id, type) });
+    }catch(e){
+        console.error(e);
+    }
 })
 
 router.post("/favorite", isAuth, async (req, res) => {
@@ -85,7 +88,7 @@ router.post("/get-favorite", isAuth, async (req, res) => {
             const data = await pool.query(`
             SELECT * FROM favorites WHERE id = $1`, [user])
 
-            if(data.rows[0] > 0){
+            if(data.rows.length > 0){
                 const dataMovies = await Promise.all(
                     data.rows.map(item => FindByID(item.tmdb_id, item.media_type))
                 )

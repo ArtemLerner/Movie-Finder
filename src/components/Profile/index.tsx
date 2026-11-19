@@ -25,6 +25,8 @@ export default function Profile() {
     const userImg = '../../../public/profile.svg';
 
     async function handleLogOut(){
+        if(!user) return;
+
         try{
             setLoading(true);
             await fetch(`${VITE_URL}/auth/logout`, {
@@ -37,29 +39,34 @@ export default function Profile() {
             setLoading(false);
         }
     }
+
     useEffect(()=>{
         if(!user) return;
-        const email = user?.email
 
         async function handleLogout(){
+            if(!user) return;
+
             try{
                 setLoading(true);
                 const res = await fetch(`${VITE_URL}/api/get-favorite`,{
                     method: "POST",
                     credentials: "include",
                     headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({email})
                 })
                 const data = await res.json();
-
-                setFavorites(data.movies);
-                setLoading(false);
+                if(res.ok){
+                    setFavorites(data.movies);
+                    setLoading(false);
+                }else{
+                    console.log(data.error);
+                }
 
             }catch (error) {
+                console.log(error);
             }
 
         }
-        handleLogout();
+        void handleLogout();
     },[user])
 
     return (
@@ -71,7 +78,6 @@ export default function Profile() {
                             <img className="profile__avatar" src={userImg} alt="User avatar"/>
                             <div className="profile__info">
                                 <h1 className="profile__name">{user?.email}</h1>
-                                <p className="profile__email">artem@example.com</p>
                             </div>
 
                             <button className="profile__logout" type="button" onClick={handleLogOut}>

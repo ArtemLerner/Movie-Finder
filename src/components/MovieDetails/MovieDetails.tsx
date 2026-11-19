@@ -11,40 +11,35 @@ type Props = {
 const URL = import.meta.env.VITE_URL;
 
 export default  function MovieDetails({type, data}: Props){
-    const [favorites, setFavorites] = useState<any[]>([]);
+    const [favorites, setFavorites] = useState<[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [movie, setMovie] = useState<MovieDetailsType | null>(null);
     const {user} = useAuth();
 
     useEffect(() => {
         if (!type || !data) return;
-
         async function loadMovies(){
             try{
-                const res = await fetch(`${URL}/api/${type}/${data}`,{
-                    credentials: "include",
-                }).finally(()=>setLoading(false));
+                const res = await fetch(`${URL}/api/${type}/${data}`,
+                    {credentials: "include",})
+                    .finally(()=>setLoading(false));
 
                 const dataRes = await res.json();
+
+                if (!res.ok) await dataRes.error
+
                 setMovie(dataRes.results)
             }catch(err){
                 console.log(err);
             }
         }
-
-
         void loadMovies();
-
-
-
     }, [type, data, user])
 
     useEffect(()=>{
-        console.log("effect run", user);
 
         async function getAllFavoriteMovies(){
-
-            if(!user) return  console.log("No user found");
+            if(!user) return;
 
             const email = user?.email;
             try{
@@ -55,55 +50,43 @@ export default  function MovieDetails({type, data}: Props){
                     body: JSON.stringify({email})
                 })
                 const dataRes = await res.json();
-
-
                 if(res.ok){
-                    console.log(dataRes.movies);
-                    setFavorites(dataRes.movies)
+                    setFavorites(dataRes.movies ?? [])
                 }else{
                     console.log(dataRes.error)
                 }
-            }catch (err){
-                console.log(err);
+            }catch{
+                console.log();
             }
         }
         void getAllFavoriteMovies()
 
     },[user])
-    const isFavorite = favorites.some(
-        m => String(m.id) === data && m.media_type === type
+
+    const isFavorite = favorites?.some(
+            m => String(m.id) === data && m.media_type === type
     );
 
 
-    if (loading) return (
-        <Loading/>
-    )
+
+    if (loading) return <Loading/>
     if (!movie) return null;
-
-
-
-
- // TODO 1.get-favorit fetch -> nav check ? setFavorite(true) : false
- //      2.fix: find the token
-
-
 
 
 
     async function handleAddFavorite(){
         if(!user) return
 
-        const email = user.email;
         try {
             const res = await fetch(`${URL}/api/favorite`,{
                 method: "POST",
                 credentials: "include",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({emailUser: email, type, id: data})
+                body: JSON.stringify({type, id: data})
             })
 
             if (res.ok) {
-                setFavorites(prev => [...prev, { id: Number(data), media_type: type }]);
+                setFavorites(prev => [...(prev ?? []), { id: Number(data), media_type: type }]);
             }
 
         }catch(err){
@@ -114,15 +97,16 @@ export default  function MovieDetails({type, data}: Props){
     async function handleRemoveFavorite(){
         if(!user) return
 
-        const email = user.email;
         try {
             const res = await fetch(`${URL}/api/favorite-del`,{
                 method: "POST",
                 credentials: "include",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({emailUser: email, type, id: data})
+                body: JSON.stringify({type, id: data})
             })
+
             if (!res.ok) return
+
             setFavorites(prev =>
                 prev.filter(m => !(String(m.id) === data && m.media_type === type))
             );
@@ -166,13 +150,13 @@ export default  function MovieDetails({type, data}: Props){
                     <p className="movie__overview">{movie.overview}</p>
 
                     <div className="movie__actions">
-                        <button className="movie__btn movie__btn--primary">Смотреть</button>
+                        <button className="movie__btn movie__btn--primary">Watch now</button>
 
                         <button
                             className={isFavorite ? "movie__btn__del" : "movie__btn"}
                             onClick={isFavorite ? handleRemoveFavorite : handleAddFavorite}
                         >
-                            {isFavorite ? 'Уже в избранном' : 'В избранное'}
+                            {isFavorite ? 'Removed form favorites' : 'Add in favorites'}
                         </button>
 
                     </div>

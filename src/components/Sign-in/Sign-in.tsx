@@ -62,10 +62,6 @@ export default function SignIn() {
             return;
         }
 
-        // Если все проверки пройдены — отправляем данные на сервер
-
-
-
         try {
             setLoadingReg(true);
             const res = await fetch(`${SERVER_URL}/auth/register`, {
@@ -75,11 +71,11 @@ export default function SignIn() {
                 body: JSON.stringify({email: regEmail, password: regPassword})
             }).finally(()=>setLoadingReg(false))
 
-
+            const data = await res.json();
             if (res.ok) {
                 setPopup(true);
             }else {
-                setRegError("Email already exists!");
+                setRegError(data.error || data.message || 'Email already exists');
             }
         }catch(err) {
             console.log(err);
@@ -109,8 +105,7 @@ export default function SignIn() {
                 nav("/profile");
             } else {
                 setPopup(false);
-                console.log(data.message);
-                setLoginError(data.message);
+                setLoginError(data.error || data.message || 'Email already exists');
             }
 
         } catch (err) {
@@ -127,7 +122,7 @@ export default function SignIn() {
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({email: regEmail, token})
-            })
+            }).finally(()=>setLoadingPop(false))
 
             const data = await res.json();
 
@@ -146,6 +141,7 @@ export default function SignIn() {
             }
         }catch(err) {
             console.log(err);
+            setLoadingPop(false);
             return false;
         }
 
