@@ -17,4 +17,9 @@ export type MovieDetailsType = MovieCartType & {
     runtime?: number;
     genres?: { id: number; name: string }[];
 };
+export type MediaType = 'movie' | 'tv';
 
+export type FavoriteRef = { id: number; media_type: MediaType };
+
+export const isMediaType = (v: string | undefined): v is MediaType =>
+    v === 'movie' || v === 'tv';

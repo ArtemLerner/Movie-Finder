@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react";
-import type { MovieDetailsType} from "../../share/types/MovieCart.ts";
+import {isMediaType, type MovieDetailsType} from "../../share/types/MovieCart.ts";
 import '../MovieDetails/profile-module.css'
 import Loading from "../Loading/Loading.tsx";
 import {useAuth} from "../../context/AuthContext.tsx";
@@ -11,7 +11,7 @@ type Props = {
 const URL = import.meta.env.VITE_URL;
 
 export default  function MovieDetails({type, data}: Props){
-    const [favorites, setFavorites] = useState<[]>([]);
+    const [favorites, setFavorites] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [movie, setMovie] = useState<MovieDetailsType | null>(null);
     const {user} = useAuth();
@@ -63,7 +63,7 @@ export default  function MovieDetails({type, data}: Props){
 
     },[user])
 
-    const isFavorite = favorites?.some(
+    const isFavorite = isMediaType(type) && favorites?.some(
             m => String(m.id) === data && m.media_type === type
     );
 
@@ -86,7 +86,7 @@ export default  function MovieDetails({type, data}: Props){
             })
 
             if (res.ok) {
-                setFavorites(prev => [...(prev ?? []), { id: Number(data), media_type: type }]);
+                setFavorites(prev => [...(prev ?? []), { id: data, media_type: type }]);
             }
 
         }catch(err){
