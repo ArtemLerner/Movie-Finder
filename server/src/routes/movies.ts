@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {FindByID, MediaType, Movie, SearchMovies} from "../services/tmdb"
 import {pool} from "../db";
+import {isAuth} from "./auth"
 
 const router = Router();
 
@@ -42,7 +43,6 @@ router.get("/search", async (req, res) => {
 router.get("/:type/:id", async (req, res) => {
     const { type, id } = req.params;
 
-
     if (type !== 'movie' && type !== 'tv') {
         return res.status(400).json({ error: 'type must be movie or tv' });
     }
@@ -54,8 +54,11 @@ router.get("/:type/:id", async (req, res) => {
     res.json({results: await FindByID(id, type) });
 })
 
-router.post("/favorite", async (req, res) => {
+router.post("/favorite", isAuth, async (req, res) => {
     const {emailUser, type, id } = req.body;
+    const user = res.locals.user.id;
+
+    if(!user) return res.status(400).json({ error: 'user must be provided' });
 
     if (type !== 'movie' && type !== 'tv') {
         return res.status(400).json({ error: 'type must be movie or tv' });
@@ -67,6 +70,7 @@ router.post("/favorite", async (req, res) => {
         SELECT id, $2, $3 FROM users WHERE email = $1
         ON CONFLICT DO NOTHING
         `, [emailUser, id, type])
+
     res.status(200).json({ ok: true });
 
     if(resPool.rowCount === 0){
@@ -77,29 +81,21 @@ router.post("/favorite", async (req, res) => {
 
 
 
-router.post("/get-favorite", async (req, res) => {
-    const { email } = req.body;
+router.post("/get-favorite", isAuth, async (req, res) => {
+    const user = res.locals.user.id;
 
-    const user = await pool.query(`
-    SELECT id FROM users WHERE email = $1`, [email])
-
-    if(user.rows[0] !== 0){
-
-        const userID = user.rows[0]?.id
-
+    if(user){
             const data = await pool.query(`
-            SELECT * FROM favorites WHERE id = $1`, [userID])
-
-            const type: MediaType[] = data.rows.map(type => type.media_type)
-            const movieId: string[] = data.rows.map(id => id.tmdb_id)
+            SELECT * FROM favorites WHERE id = $1`, [user])
 
             if(data.rows.length !== 0){
                 const dataMovies = await Promise.all(
                     data.rows.map(item => FindByID(item.tmdb_id, item.media_type))
                 )
                 res.status(200).json({movies: dataMovies});
+
             }else{
-                res.status(400).json({ error: data.rows })
+                res.status(201).json({ error: "no favorites yet" });
             }
     }else{
         res.status(400).json({ error: 'email is required' })
@@ -107,8 +103,11 @@ router.post("/get-favorite", async (req, res) => {
 })
 
 
-router.post("/favorite-del", async (req, res) => {
+router.post("/favorite-del", isAuth, async (req, res) => {
     const {emailUser, type, id } = req.body;
+
+    const user = res.locals.user.id;
+    if(!user) return res.status(400).json({ error: 'user must be provided' });
 
     if (type !== 'movie' && type !== 'tv') {
         return res.status(400).json({ error: 'type must be movie or tv' });

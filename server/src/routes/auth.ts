@@ -8,7 +8,7 @@ import Mail from "../services/mail"
 
 const router = Router();
 
-router.post('/register', async (req, res) => {
+router.post('/register', async (req: express.Request, res: express.Response) => {
     try {
         const { email, password } = req.body;
 
@@ -74,7 +74,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: express.Request, res: express.Response) => {
     const { email, password } = req.body;
 
     if (!email || !password || password.length < 6) {
@@ -97,7 +97,7 @@ router.post('/login', async (req, res) => {
 
 })
 
-router.post('/logout', async (_req, res) => {
+router.post('/logout', async (_req: express.Request, res: express.Response): Promise<void> => {
     const isProd = process.env.NODE_ENV === "production";
 
     res.clearCookie('token',
@@ -105,7 +105,7 @@ router.post('/logout', async (_req, res) => {
     res.json({ message: "Logged out" });
 })
 
-router.get('/me', async (req, res) => {
+router.get('/me', async (req: express.Request, res: express.Response) => {
     const token = req.cookies.token;
 
     const SECRET = process.env.JWT_SECRET;
@@ -120,7 +120,7 @@ router.get('/me', async (req, res) => {
         const payload = jwt.verify(token, SECRET) as {id: number};
 
         const result = await pool.query(
-            `SELECT * FROM users WHERE id = $1`, [payload.id]);
+            `SELECT id, email FROM users WHERE id = $1`, [payload.id]);
 
         const user = result.rows[0];
 
@@ -134,7 +134,7 @@ router.get('/me', async (req, res) => {
     }
 })
 
-router.post('/verify-e', async (req, res) => {
+router.post('/verify-e', async (req: express.Request, res: express.Response): Promise<void> => {
     const {email, token} = req.body;
 
         try{
@@ -177,7 +177,6 @@ router.post('/verify-e', async (req, res) => {
 
 })
 
-
 function setAuthCookie(res: express.Response, userId: number) {
 
     const SECRET = process.env.JWT_SECRET;
@@ -196,6 +195,33 @@ function setAuthCookie(res: express.Response, userId: number) {
         sameSite: isProd ? "none" : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
     })
+}
+
+export async function isAuth(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+    const token = req.cookies.token;
+
+    const SECRET = process.env.JWT_SECRET;
+    let user;
+
+    if (!SECRET) {
+        throw new Error("JWT_SECRET is not set in .env");
+    }
+    try{
+        const payload = jwt.verify(token, SECRET) as {id: number};
+
+        const result = await pool.query(
+            `SELECT id, email FROM users WHERE id = $1`, [payload.id]);
+
+        user = result.rows[0];
+
+        if(!user) res.status(401).json({ message: "User not found" });
+
+    }catch{
+        res.status(401).json({ message: "Invalid auth" });
+    }
+
+    res.locals.user = user;
+    next();
 }
 
 

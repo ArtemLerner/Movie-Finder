@@ -44,6 +44,10 @@ export default async function initDB() {
             ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
     `);
 
+    pool.on("error", (err) => {
+        console.error("PG pool error:", err.message);
+    });
+
     await cleanupPending().catch(console.error);
 
     setInterval(() => cleanupPending().catch(console.error), 60 * 60 * 1000).unref();
