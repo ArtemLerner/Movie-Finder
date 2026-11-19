@@ -2,13 +2,22 @@ import express ,{Router} from "express";
 import {pool} from "../db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { v4 as uuidv4 } from "uuid";
 import Mail from "../services/mail"
+import rateLimit from "express-rate-limit";
+
+const limit = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 4,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { error: 'Too many requests' }
+
+})
 
 
 const router = Router();
 
-router.post('/register', async (req: express.Request, res: express.Response) => {
+router.post('/register',limit, async (req: express.Request, res: express.Response) => {
     try {
         const { email, password } = req.body;
 
@@ -28,9 +37,9 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
         }
 
         const passHash = await bcrypt.hash(password, 10);
-        const emailToken = uuidv4().slice(0, 6);
 
-        // Проверяем, есть ли пользователь в таблице ожидания users_pending
+        const emailToken = crypto.randomUUID().slice(0, 8);
+
         const userFindPend = await pool.query(
             `SELECT id FROM users_pending WHERE email = $1`,
             [email]
@@ -74,7 +83,7 @@ router.post('/register', async (req: express.Request, res: express.Response) => 
     }
 });
 
-router.post('/login', async (req: express.Request, res: express.Response) => {
+router.post('/login',limit, async (req: express.Request, res: express.Response) => {
     const { email, password } = req.body;
 
     if (!email || !password || password.length < 6) {
@@ -134,7 +143,7 @@ router.get('/me', async (req: express.Request, res: express.Response) => {
     }
 })
 
-router.post('/verify-e', async (req: express.Request, res: express.Response): Promise<void> => {
+router.post('/verify-e',limit, async (req: express.Request, res: express.Response): Promise<void> => {
     const {email, token} = req.body;
 
         try{

@@ -6,7 +6,6 @@ export default async function Mail(to: string, code: string) {
 
     const error = await resend.emails.send({
         from: process.env.RESEND_FROM ?? 'MovieFinder <onboarding@resend.dev>',
-
         to,
         subject: "Your verification code",
         text: `

@@ -1,11 +1,9 @@
 import { Router } from "express";
-import {FindByID, MediaType, Movie, SearchMovies} from "../services/tmdb"
+import {FindByID, Movie, SearchMovies} from "../services/tmdb"
 import {pool} from "../db";
 import {isAuth} from "./auth"
 
 const router = Router();
-
-
 
 router.get("/trending/:mediaType/:timeWindow", async (req, res) => {
     const { mediaType, timeWindow } = req.params;
@@ -38,7 +36,6 @@ router.get("/search", async (req, res) => {
         console.error(error);
     }
 })
-
 
 router.get("/:type/:id", async (req, res) => {
     const { type, id } = req.params;
@@ -78,9 +75,6 @@ router.post("/favorite", isAuth, async (req, res) => {
     }
 })
 
-
-
-
 router.post("/get-favorite", isAuth, async (req, res) => {
     const user = res.locals.user.id;
 
@@ -101,7 +95,6 @@ router.post("/get-favorite", isAuth, async (req, res) => {
         res.status(400).json({ error: 'email is required' })
     }
 })
-
 
 router.post("/favorite-del", isAuth, async (req, res) => {
     const {emailUser, type, id } = req.body;
@@ -127,6 +120,5 @@ router.post("/favorite-del", isAuth, async (req, res) => {
         res.status(400).json({ error: 'email is required' })
     }
 })
-
 
 export default router;
