@@ -22,16 +22,14 @@ export async function Movie(mediaType: MediaType, timeWindow: timeWindow) {
 export async function SearchMovies(query: string) {
     try {
         const res = await fetch(
-            `${BASE}search/multi?query=${encodeURIComponent(query)}`
-
-            , {
+            `${BASE}search/multi?query=${encodeURIComponent(query)}`, {
                 headers: {Authorization: `Bearer ${TMDB_TOKENT}`},
             });
 
         const data = await res.json();
         return data.results;
-    } catch (error) {
-        console.error(error);
+    } catch{
+        console.log('Error fetching search results');
     }
 }
 
@@ -47,7 +45,7 @@ export async function FindByID(movieId: string, type :MediaType) {
         data.id = movieId;
         return data;
 
-    }catch (error){
+    }catch{
         console.error('MovieDetails error');
     }
 

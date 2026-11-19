@@ -29,11 +29,14 @@ router.get("/search", async (req, res) => {
     if (typeof query !== "string" || !query.trim()) {
         return res.status(400).json({ error: "q is required" });
     }
+    if(query === ''){
+        return res.status(400).json({ error: "query must be provided" });
+    }
 
     try{
         res.json({results: await SearchMovies(query)})
-    }catch (error){
-        console.error(error);
+    }catch{
+        res.status(201).json({ error: 'Search results not found' });
     }
 })
 
@@ -52,7 +55,7 @@ router.get("/:type/:id", async (req, res) => {
 })
 
 router.post("/favorite", isAuth, async (req, res) => {
-    const {emailUser, type, id } = req.body;
+    const {type, id } = req.body;
     const user = res.locals.user.id;
 
     if(!user) return res.status(400).json({ error: 'user must be provided' });
@@ -61,17 +64,17 @@ router.post("/favorite", isAuth, async (req, res) => {
         return res.status(400).json({ error: 'type must be movie or tv' });
     }
 
-    const resPool = await pool.query(
-        `
+    try{
+        await pool.query(`
         INSERT INTO favorites (id, tmdb_id,media_type)
-        SELECT id, $2, $3 FROM users WHERE email = $1
+        VALUES ($1, $2, $3)
         ON CONFLICT DO NOTHING
-        `, [emailUser, id, type])
+        `, [user, id, type]);
 
-    res.status(200).json({ ok: true });
-
-    if(resPool.rowCount === 0){
-        res.status(400).json({ error: 'email is required' })
+        res.status(200).json({ ok: true });
+    }catch (e) {
+        console.error(e);
+        return res.status(500).json({ error: "Server error" });
     }
 })
 
@@ -82,14 +85,11 @@ router.post("/get-favorite", isAuth, async (req, res) => {
             const data = await pool.query(`
             SELECT * FROM favorites WHERE id = $1`, [user])
 
-            if(data.rows.length !== 0){
+            if(data.rows[0] > 0){
                 const dataMovies = await Promise.all(
                     data.rows.map(item => FindByID(item.tmdb_id, item.media_type))
                 )
                 res.status(200).json({movies: dataMovies});
-
-            }else{
-                res.status(201).json({ error: "no favorites yet" });
             }
     }else{
         res.status(400).json({ error: 'email is required' })
@@ -97,7 +97,7 @@ router.post("/get-favorite", isAuth, async (req, res) => {
 })
 
 router.post("/favorite-del", isAuth, async (req, res) => {
-    const {emailUser, type, id } = req.body;
+    const {type, id } = req.body;
 
     const user = res.locals.user.id;
     if(!user) return res.status(400).json({ error: 'user must be provided' });
@@ -106,19 +106,17 @@ router.post("/favorite-del", isAuth, async (req, res) => {
         return res.status(400).json({ error: 'type must be movie or tv' });
     }
 
-    const resPool = await pool.query(
+    await pool.query(
         `
             DELETE FROM favorites
-            WHERE id = (SELECT id FROM users WHERE email = $1)
+            WHERE id = $1
            AND tmdb_id = $2
            AND media_type = $3`,
-        [emailUser, String(id), type]
+        [user, String(id), type]
     );
 
     res.status(200).json({ ok: true });
-    if(resPool.rowCount === 0){
-        res.status(400).json({ error: 'email is required' })
-    }
+
 })
 
 export default router;

@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function Mail(to: string, code: string) {
 
-    const error = await resend.emails.send({
+    const { error }  = await resend.emails.send({
         from: process.env.RESEND_FROM ?? 'MovieFinder <onboarding@resend.dev>',
         to,
         subject: "Your verification code",
