@@ -42,7 +42,7 @@ export async function FindByID(movieId: string, type :MediaType) {
         const data = await response.json();
 
         data.media_type = type;
-        data.id = movieId;
+
         return data;
 
     }catch{

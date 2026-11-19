@@ -11,7 +11,9 @@ import type {MovieDetailsType} from "../../share/types/MovieCart.ts";
 export default function Profile() {
     const {user, setUser} = useAuth();
     const nav = useNavigate();
+
     const [favorites, setFavorites] = useState<MovieDetailsType[]>([]);
+
     const [loading, setLoading] = useState(false);
     const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
 
@@ -54,13 +56,13 @@ export default function Profile() {
                     headers: {"Content-Type": "application/json"},
                 })
                 const data = await res.json();
+
                 if(res.ok){
                     setFavorites(data.movies);
                     setLoading(false);
                 }else{
                     console.log(data.error);
                 }
-
             }catch (error) {
                 console.log(error);
             }
@@ -87,7 +89,7 @@ export default function Profile() {
 
                         <section className="profile__favorites">
                             <h2>Favorite movies</h2>
-                            {favorites ?
+                            {favorites  ?
                             <ul className="movie-list">
                                 <Swiper
                                     modules={[Navigation]}

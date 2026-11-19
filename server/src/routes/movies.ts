@@ -92,7 +92,10 @@ router.post("/get-favorite", isAuth, async (req, res) => {
                 const dataMovies = await Promise.all(
                     data.rows.map(item => FindByID(item.tmdb_id, item.media_type))
                 )
+
                 res.status(200).json({movies: dataMovies});
+            }else {
+                res.status(201).json({movies: data.rows[0], error: "No movies found"});
             }
     }else{
         res.status(400).json({ error: 'email is required' })
