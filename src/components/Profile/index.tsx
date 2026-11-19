@@ -50,10 +50,8 @@ export default function Profile() {
 
             try{
                 setLoading(true);
-                const res = await fetch(`${VITE_URL}/api/get-favorite`,{
-                    method: "POST",
+                const res = await fetch(`${VITE_URL}/api/favorites`,{
                     credentials: "include",
-                    headers: {"Content-Type": "application/json"},
                 })
                 const data = await res.json();
 

@@ -37,19 +37,16 @@ export default  function MovieDetails({type, data}: Props){
     }, [type, data, user])
 
     useEffect(()=>{
+        if(!user) return;
 
         async function getAllFavoriteMovies(){
-            if(!user) return;
-
-            const email = user?.email;
             try{
-                const res = await fetch(`${URL}/api/get-favorite`,{
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
+                const res = await fetch(`${URL}/api/favorites`,{
                     credentials: "include",
-                    body: JSON.stringify({email})
                 })
+
                 const dataRes = await res.json();
+
                 if(res.ok){
                     setFavorites(dataRes.movies ?? [])
                 }else{
@@ -98,11 +95,9 @@ export default  function MovieDetails({type, data}: Props){
         if(!user) return
 
         try {
-            const res = await fetch(`${URL}/api/favorite-del`,{
-                method: "POST",
+            const res = await fetch(`${URL}/api/favorite/${type}/${data}`,{
+                method: "DELETE",
                 credentials: "include",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({type, id: data})
             })
 
             if (!res.ok) return

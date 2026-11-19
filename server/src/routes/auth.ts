@@ -25,8 +25,6 @@ router.post('/register',limit, async (req: express.Request, res: express.Respons
             return res.status(400).json({ message: "Некорректные данные" });
         }
 
-        // Проверяем, есть ли уже ПОДТВЕРЖДЕННЫЙ пользователь в основной таблице users
-        // ВАЖНО: проверяем .length > 0, так как rows — это массив!
         const userFind = await pool.query(
             `SELECT id FROM users WHERE email = $1`,
             [email]
@@ -106,30 +104,34 @@ router.post('/login',limit, async (req: express.Request, res: express.Response) 
 
 })
 
-router.post('/logout', async (_req: express.Request, res: express.Response): Promise<void> => {
+router.post('/logout',isAuth, async (_req: express.Request, res: express.Response): Promise<void> => {
+    const user = res.locals.user.id;
+    if(!user) return
+
     const isProd = process.env.NODE_ENV === "production";
 
-    res.clearCookie('token',
-        { httpOnly: true, secure: isProd, sameSite: isProd ? "none" : "lax" });
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax"
+    });
+
     res.json({ message: "Logged out" });
 })
 
-router.get('/me', async (req: express.Request, res: express.Response) => {
+router.get('/me', isAuth , async (req: express.Request, res: express.Response) => {
     const token = req.cookies.token;
+    const userId = res.locals.user.id;
 
     const SECRET = process.env.JWT_SECRET;
 
-    if(!SECRET) return
-
-    if (!token) {
+    if (!token || !userId || !SECRET) {
         return res.status(400).json({ message: "Not logged in" });
     }
 
     try{
-        const payload = jwt.verify(token, SECRET) as {id: number};
-
         const result = await pool.query(
-            `SELECT id, email FROM users WHERE id = $1`, [payload.id]);
+            `SELECT id, email FROM users WHERE id = $1`, [userId]);
 
         const user = result.rows[0];
 

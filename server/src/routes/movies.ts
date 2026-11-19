@@ -57,6 +57,8 @@ router.get("/:type/:id", async (req, res) => {
     }
 })
 
+
+
 router.post("/favorite", isAuth, async (req, res) => {
     const {type, id } = req.body;
     const user = res.locals.user.id;
@@ -81,7 +83,7 @@ router.post("/favorite", isAuth, async (req, res) => {
     }
 })
 
-router.post("/get-favorite", isAuth, async (req, res) => {
+router.get("/favorites", isAuth, async (req, res) => {
     const user = res.locals.user.id;
 
     if(user){
@@ -102,8 +104,8 @@ router.post("/get-favorite", isAuth, async (req, res) => {
     }
 })
 
-router.post("/favorite-del", isAuth, async (req, res) => {
-    const {type, id } = req.body;
+router.delete("/favorite/:type/:id", isAuth, async (req, res) => {
+    const {type, id } = req.params;
 
     const user = res.locals.user.id;
     if(!user) return res.status(400).json({ error: 'user must be provided' });
@@ -124,5 +126,6 @@ router.post("/favorite-del", isAuth, async (req, res) => {
     res.status(200).json({ ok: true });
 
 })
+
 
 export default router;
