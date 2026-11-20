@@ -24,7 +24,7 @@ export default function Profile() {
         if(!user) nav('/register');
     });
 
-    const userImg = '../../../public/profile.svg';
+    const userImg = '/profile.svg';
 
     async function handleLogOut(){
         if(!user) return;
