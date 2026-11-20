@@ -87,20 +87,25 @@ router.get("/favorites", isAuth, async (req, res) => {
     const user = res.locals.user.id;
 
     if(user){
-            const data = await pool.query(`
-            SELECT * FROM favorites WHERE id = $1`, [user])
+            try{
+                const data = await pool.query(`
+                SELECT * FROM favorites WHERE id = $1`, [user])
 
-            if(data.rows.length > 0){
-                const dataMovies = await Promise.all(
-                    data.rows.map(item => FindByID(item.tmdb_id, item.media_type))
-                )
+                if(data.rows.length > 0){
+                    const dataMovies = await Promise.all(
+                        data.rows.map(item => FindByID(item.tmdb_id, item.media_type))
+                    )
 
-                res.status(200).json({movies: dataMovies});
-            }else {
-                res.status(201).json({movies: data.rows[0], error: "No movies found"});
+                    res.status(200).json({movies: dataMovies});
+
+                }else {
+                    res.status(201).json({movies: data.rows[0], error: "No movies found"});
+                }
+            }catch(e){
+                res.status(400).json({ error: "Server error:" + e });
             }
-    }else{
-        res.status(400).json({ error: 'email is required' })
+    }else {
+        res.status(404).json({ error: "No user found" });
     }
 })
 
@@ -108,22 +113,27 @@ router.delete("/favorite/:type/:id", isAuth, async (req, res) => {
     const {type, id } = req.params;
 
     const user = res.locals.user.id;
+
     if(!user) return res.status(400).json({ error: 'user must be provided' });
 
     if (type !== 'movie' && type !== 'tv') {
         return res.status(400).json({ error: 'type must be movie or tv' });
     }
-
-    await pool.query(
-        `
+    try {
+        await pool.query(
+            `
             DELETE FROM favorites
             WHERE id = $1
            AND tmdb_id = $2
            AND media_type = $3`,
-        [user, String(id), type]
-    );
+            [user, String(id), type]
+        );
 
-    res.status(200).json({ ok: true });
+        res.status(200).json({ ok: true });
+    }catch(e){
+        res.status(400).json({ error: "Server error:" + e });
+    }
+
 
 })
 

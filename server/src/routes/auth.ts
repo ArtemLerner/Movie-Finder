@@ -18,13 +18,11 @@ const limit = rateLimit({
 const router = Router();
 
 router.post('/register',limit, async (req: express.Request, res: express.Response) => {
+    const { email, password } = req.body;
+    if (!email || !password || password.length < 6) {
+        return res.status(400).json({ message: "Некорректные данные" });
+    }
     try {
-        const { email, password } = req.body;
-
-        if (!email || !password || password.length < 6) {
-            return res.status(400).json({ message: "Некорректные данные" });
-        }
-
         const userFind = await pool.query(
             `SELECT id FROM users WHERE email = $1`,
             [email]
@@ -44,9 +42,7 @@ router.post('/register',limit, async (req: express.Request, res: express.Respons
         );
 
         let savedUser;
-
         if (userFindPend.rows.length > 0) {
-            // ПЕРЕЗАПИСЫВАЕМ данные существующей записи в users_pending
             const updatedUser = await pool.query(
                 `UPDATE users_pending
                  SET password = $1,
@@ -58,7 +54,6 @@ router.post('/register',limit, async (req: express.Request, res: express.Respons
             );
             savedUser = updatedUser.rows[0];
         } else {
-            // СОЗДАЕМ новую запись, если её ещё нет
             const insertedUser = await pool.query(
                 `INSERT INTO users_pending (email, password, email_token, created_at)
                  VALUES ($1, $2, $3, NOW())

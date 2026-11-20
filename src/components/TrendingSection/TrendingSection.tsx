@@ -5,12 +5,11 @@ import MovieCart from "../../components/MovieCart/MovieCart.tsx";
 import MovieSwitchers from "../../components/MovieSwitchers/MovieSwitchers.tsx";
 import type {MovieCartType} from "../../share/types/MovieCart.ts";
 import {Swiper, SwiperSlide} from "swiper/react";
-import {Navigation} from "swiper/modules";
+import {Autoplay, Navigation} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import Loading from "../Loading/Loading.tsx";
 import type SwiperType from "swiper"
-
 
 interface Props {
     mediaType: MediaType;
@@ -52,24 +51,24 @@ export default function TrendingSection({ mediaType }: Props) {
                     :
                     <div className="movie-list">
                         <Swiper
-                            modules={[Navigation]}
+                            modules={[Navigation, Autoplay]}
+                            loop={movies.length > 8}
+                            loopAdditionalSlides={6}
+                            autoplay={{
+                                delay: 2500,
+                                disableOnInteraction: false,
+                                pauseOnMouseEnter: true,
+                            }}
                             navigation
                             spaceBetween={16}
-                            freeMode
                             slidesPerView="auto"
                             onSwiper={setSwiperInstance}
-                            breakpoints={{
-                                390: { slidesPerView: 2 },
-                                768: { slidesPerView: 4 },
-                                1200: { slidesPerView: 6 },
-                            }}
                         >
-                            {movies.map(movie =>
+                            {movies.map(movie => (
                                 <SwiperSlide key={movie.id}>
-                                    <MovieCart key={movie.poster_path} swiper={swiperInstance} data={movie}/>
+                                    <MovieCart swiper={swiperInstance} data={movie} />
                                 </SwiperSlide>
-                            )}
-
+                            ))}
                         </Swiper>
 
                     </div>

@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Loading from "../Loading/Loading.tsx";
 import MovieCart from "../MovieCart/MovieCart.tsx";
-import {Navigation} from "swiper/modules";
+import {Autoplay, Navigation} from "swiper/modules";
 import {Swiper, SwiperSlide} from "swiper/react";
 import type SwiperType from "swiper";
 import type {MovieDetailsType} from "../../share/types/MovieCart.ts";
@@ -90,17 +90,18 @@ export default function Profile() {
                             {favorites  ?
                             <ul className="movie-list">
                                 <Swiper
-                                    modules={[Navigation]}
+                                    modules={[Navigation, Autoplay]}
+                                    loop={favorites.length > 8}
+                                    loopAdditionalSlides={6}
+                                    autoplay={{
+                                        delay: 2500,
+                                        disableOnInteraction: false,
+                                        pauseOnMouseEnter: true,
+                                    }}
                                     navigation
                                     spaceBetween={16}
-                                    freeMode
                                     slidesPerView="auto"
                                     onSwiper={setSwiperInstance}
-                                    breakpoints={{
-                                        390: { slidesPerView: 2 },
-                                        768: { slidesPerView: 4 },
-                                        1200: { slidesPerView: 6 },
-                                    }}
                                 >
                                     {favorites.map(movie =>
                                         <SwiperSlide key={movie.id}>
