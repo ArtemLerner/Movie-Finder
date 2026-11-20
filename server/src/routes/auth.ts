@@ -4,6 +4,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Mail from "../services/mail"
 import rateLimit from "express-rate-limit";
+import {isAuth} from "../middleware/isAuth";
+import {validate} from "../middleware/validate";
+import {credentials, credentialsVarify} from "../schemas";
 
 const limit = rateLimit({
     windowMs: 60 * 1000,
@@ -17,11 +20,12 @@ const limit = rateLimit({
 
 const router = Router();
 
-router.post('/register',limit, async (req: express.Request, res: express.Response) => {
-    const { email, password } = req.body;
-    if (!email || !password || password.length < 6) {
-        return res.status(400).json({ message: "Некорректные данные" });
-    }
+router.post('/register'
+    ,limit, validate("body", credentials)
+    , async (_req: express.Request, res: express.Response) => {
+
+    const { email, password } = res.locals.body;
+
     try {
         const userFind = await pool.query(
             `SELECT id FROM users WHERE email = $1`,
@@ -76,8 +80,10 @@ router.post('/register',limit, async (req: express.Request, res: express.Respons
     }
 });
 
-router.post('/login',limit, async (req: express.Request, res: express.Response) => {
-    const { email, password } = req.body;
+router.post('/login',
+    limit,validate("body", credentials)
+    , async (_req: express.Request, res: express.Response) => {
+    const { email, password } = res.locals.body;
 
     if (!email || !password || password.length < 6) {
         return res.status(400).json({ message: "Некорректные данные" });
@@ -140,9 +146,11 @@ router.get('/me', isAuth , async (req: express.Request, res: express.Response) =
     }
 })
 
-router.post('/verify-e',limit, async (req: express.Request, res: express.Response): Promise<void> => {
-    const {email, token} = req.body;
+router.post('/verify-e'
+    ,limit,validate("body", credentialsVarify)
+    , async (_req: express.Request, res: express.Response) => {
 
+    const {email, token} = res.locals.body;
         try{
             const emailTokenSaveBD = await pool.query(
                 `UPDATE users_pending 
@@ -172,12 +180,11 @@ router.post('/verify-e',limit, async (req: express.Request, res: express.Respons
 
                  const user = result.rows[0];
 
-                 res.status(200).json({ user });
+                 return res.status(200).json({ user });
              }
 
         }catch {
-            res.status(401).json({message: "Invalid fetch"});
-
+            return res.status(401).json({message: "Invalid fetch"});
         }
 
 
@@ -203,32 +210,7 @@ function setAuthCookie(res: express.Response, userId: number) {
     })
 }
 
-export async function isAuth(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
-    const token = req.cookies.token;
 
-    const SECRET = process.env.JWT_SECRET;
-    let user;
-
-    if (!SECRET) {
-        throw new Error("JWT_SECRET is not set in .env");
-    }
-    try{
-        const payload = jwt.verify(token, SECRET) as {id: number};
-
-        const result = await pool.query(
-            `SELECT id, email FROM users WHERE id = $1`, [payload.id]);
-
-        user = result.rows[0];
-
-        if(!user) res.status(401).json({ message: "User not found" });
-
-        res.locals.user = user;
-        next();
-    }catch{
-        res.status(401).json({ message: "Invalid auth" });
-    }
-
-}
 
 
 export default router;

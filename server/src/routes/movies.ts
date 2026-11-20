@@ -1,19 +1,17 @@
 import { Router } from "express";
 import {FindByID, getAllMovies, Movie, SearchMovies} from "../services/tmdb"
 import {pool} from "../db";
-import {isAuth} from "./auth"
+import {isAuth} from "../middleware/isAuth";
+import {validate} from "../middleware/validate";
+import {allParams, detailsParams, favoriteBody, searchQuery, trendingParams} from "../schemas"
 
 const router = Router();
 
-router.get("/trending/:mediaType/:timeWindow", async (req, res) => {
-    const { mediaType, timeWindow } = req.params;
+router.get("/trending/:mediaType/:timeWindow"
+    ,validate("params", trendingParams)
+    , async (_req, res) => {
 
-    if (mediaType !== 'movie' && mediaType !== 'tv') {
-        return res.status(400).json({ error: 'type must be movie or tv' });
-    }
-    if (timeWindow !== 'day' && timeWindow !== 'week') {
-        return res.status(400).json({ error: 'window must be day or week' });
-    }
+    const { mediaType, timeWindow } = res.locals.params;
 
     try{
         res.json({results: await Movie(mediaType, timeWindow)});
@@ -23,15 +21,10 @@ router.get("/trending/:mediaType/:timeWindow", async (req, res) => {
     }
 })
 
-router.get("/search", async (req, res) => {
-    const query = req.query.q;
-
-    if (typeof query !== "string" || !query.trim()) {
-        return res.status(400).json({ error: "q is required" });
-    }
-    if(query === ''){
-        return res.status(400).json({ error: "query must be provided" });
-    }
+router.get("/search",
+    validate("query", searchQuery)
+    ,async (_req, res) => {
+    const query = res.locals.query.q;
 
     try{
         res.json({results: await SearchMovies(query)})
@@ -40,12 +33,10 @@ router.get("/search", async (req, res) => {
     }
 })
 
-router.get("/all/:mediaType", async (req, res) => {
-    const { mediaType }= req.params;
-
-    if (mediaType !== 'movie' && mediaType !== 'tv') {
-        return res.status(400).json({ error: 'type must be movie or tv' });
-    }
+router.get("/all/:mediaType",
+    validate("params", allParams)
+    ,async (_req, res) => {
+    const { mediaType }= res.locals.params;
 
     try{
         res.json({results: await getAllMovies(mediaType)});
@@ -54,18 +45,12 @@ router.get("/all/:mediaType", async (req, res) => {
     }
 })
 
-router.get("/:type/:id", async (req, res) => {
-    const { type, id } = req.params;
+router.get("/:type/:id"
+    ,validate("params", detailsParams)
+    , async (_req, res) => {
 
+    const { type, id } = res.locals.params;
 
-
-    if (type !== 'movie' && type !== 'tv') {
-        return res.status(400).json({ error: 'type must be movie or tv' });
-    }
-
-    if (typeof type !== "string" || !id.trim()) {
-        return res.status(400).json({ error: "id is required" });
-    }
     try{
         res.json({results: await FindByID(id, type) });
     }catch(e){
@@ -75,15 +60,14 @@ router.get("/:type/:id", async (req, res) => {
 
 
 
-router.post("/favorite", isAuth, async (req, res) => {
-    const {type, id } = req.body;
+router.post("/favorite"
+    , validate("body", favoriteBody)
+    ,isAuth, async (_req, res) => {
+    const {type, id } = res.locals.body;
+
     const user = res.locals.user.id;
 
     if(!user) return res.status(400).json({ error: 'user must be provided' });
-
-    if (type !== 'movie' && type !== 'tv') {
-        return res.status(400).json({ error: 'type must be movie or tv' });
-    }
 
     try{
         await pool.query(`
@@ -92,7 +76,7 @@ router.post("/favorite", isAuth, async (req, res) => {
         ON CONFLICT DO NOTHING
         `, [user, id, type]);
 
-        res.status(200).json({ ok: true });
+        return res.status(200).json({ ok: true });
     }catch (e) {
         console.error(e);
         return res.status(500).json({ error: "Server error" });
@@ -112,29 +96,29 @@ router.get("/favorites", isAuth, async (req, res) => {
                         data.rows.map(item => FindByID(item.tmdb_id, item.media_type))
                     )
 
-                    res.status(200).json({movies: dataMovies});
+                    return res.status(200).json({movies: dataMovies});
 
                 }else {
-                    res.status(201).json({movies: data.rows[0], error: "No movies found"});
+                    return res.status(201).json({movies: data.rows[0], error: "No movies found"});
                 }
             }catch(e){
-                res.status(400).json({ error: "Server error:" + e });
+                return res.status(400).json({ error: "Server error:" + e });
             }
     }else {
-        res.status(404).json({ error: "No user found" });
+        return res.status(404).json({ error: "No user found" });
     }
 })
 
-router.delete("/favorite/:type/:id", isAuth, async (req, res) => {
-    const {type, id } = req.params;
+router.delete("/favorite/:type/:id"
+    ,validate("params", detailsParams)
+    , isAuth, async (_req, res) => {
+
+    const {type, id } = res.locals.params;
 
     const user = res.locals.user.id;
 
     if(!user) return res.status(400).json({ error: 'user must be provided' });
 
-    if (type !== 'movie' && type !== 'tv') {
-        return res.status(400).json({ error: 'type must be movie or tv' });
-    }
     try {
         await pool.query(
             `
@@ -145,12 +129,10 @@ router.delete("/favorite/:type/:id", isAuth, async (req, res) => {
             [user, String(id), type]
         );
 
-        res.status(200).json({ ok: true });
+        return res.status(200).json({ ok: true });
     }catch(e){
-        res.status(400).json({ error: "Server error:" + e });
+        return res.status(400).json({ error: "Server error:" + e });
     }
-
-
 })
 
 

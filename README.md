@@ -5,7 +5,8 @@
 - [x] email checker on reg
 - [x] Movie details page
 - [x] User profile page
-- [ ] Show favorite movies in the profile
-- [ ] Add more content to the home page
+- [x] Show favorite movies in the profile
+- [x] Add more content to the home page
+- [ ] zod
 - [ ] Write tests
 - [ ] Deploy and final polish
