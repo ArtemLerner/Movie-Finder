@@ -6,8 +6,8 @@ import MovieSwitchers from "../../components/MovieSwitchers/MovieSwitchers.tsx";
 import type {MovieCartType} from "../../share/types/MovieCart.ts";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Autoplay, Navigation} from "swiper/modules";
-import "swiper/css";
 import "swiper/css/navigation";
+import "swiper/css";
 import Loading from "../Loading/Loading.tsx";
 import type SwiperType from "swiper"
 
