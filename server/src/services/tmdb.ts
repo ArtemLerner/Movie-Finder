@@ -4,6 +4,13 @@ const TMDB_TOKENT = process.env.VITE_TMDB_TOKENT;
 export type timeWindow = 'day' | 'week';
 export type MediaType = 'movie' | 'tv';
 
+export type MovieCartType = {
+    id: number;
+    title?: string;
+    name?: string;
+    poster_path: string;
+    media_type?: "movie" | "tv";
+}
 
 export async function Movie(mediaType: MediaType, timeWindow: timeWindow) {
     try{
@@ -60,7 +67,7 @@ export async function getAllMovies(mediaType :MediaType) {
 
             const data = await response.json();
 
-            return data.results.map((item) => ({
+            return data.results.map((item: MovieCartType) => ({
                 ...item,
                 media_type: mediaType,
             }));
