@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {FindByID, Movie, SearchMovies} from "../services/tmdb"
+import {FindByID, getAllMovies, Movie, SearchMovies} from "../services/tmdb"
 import {pool} from "../db";
 import {isAuth} from "./auth"
 
@@ -40,8 +40,24 @@ router.get("/search", async (req, res) => {
     }
 })
 
+router.get("/all/:mediaType", async (req, res) => {
+    const { mediaType }= req.params;
+
+    if (mediaType !== 'movie' && mediaType !== 'tv') {
+        return res.status(400).json({ error: 'type must be movie or tv' });
+    }
+
+    try{
+        res.json({results: await getAllMovies(mediaType)});
+    }catch (e){
+        res.status(500).json({ error: 'error getting movies list:' + e });
+    }
+})
+
 router.get("/:type/:id", async (req, res) => {
     const { type, id } = req.params;
+
+
 
     if (type !== 'movie' && type !== 'tv') {
         return res.status(400).json({ error: 'type must be movie or tv' });

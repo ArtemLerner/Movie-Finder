@@ -50,3 +50,22 @@ export async function FindByID(movieId: string, type :MediaType) {
     }
 
 }
+
+export async function getAllMovies(mediaType :MediaType) {
+        try{
+            const response = await fetch(
+                `${BASE}discover/${mediaType}`, {
+                    headers: { Authorization: `Bearer ${TMDB_TOKENT}` },
+                });
+
+            const data = await response.json();
+
+            return data.results.map((item) => ({
+                ...item,
+                media_type: mediaType,
+            }));
+        }catch (error){
+            console.error(error);
+        }
+
+}

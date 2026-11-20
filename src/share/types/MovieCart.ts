@@ -4,7 +4,6 @@ export type MovieCartType = {
     name?: string;
     poster_path: string;
     media_type?: "movie" | "tv";
-
 }
 
 export type MovieDetailsType = MovieCartType & {

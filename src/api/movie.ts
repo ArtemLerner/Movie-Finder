@@ -6,12 +6,26 @@ export type MediaType = 'movie' | 'tv';
 
 
 export async function Movie(mediaType: MediaType, timeWindow: timeWindow){
-
     try{
         const response = await fetch(
             `${BASE_URL}trending/${mediaType}/${timeWindow}?language=en-US`, {
                 headers: { Authorization: `Bearer ${TMDB_TOKENT}` },
             });
+        const data = await response.json();
+
+        return data.results;
+    }catch (error){
+        console.error(error);
+    }
+}
+
+export async function AllMoviesApi(MediaType: MediaType){
+    try{
+        const response = await fetch(
+            `${BASE_URL}all/${MediaType}`, {
+                headers: { Authorization: `Bearer ${TMDB_TOKENT}` },
+            });
+
         const data = await response.json();
 
         return data.results;

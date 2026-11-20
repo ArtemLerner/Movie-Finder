@@ -1,46 +1,57 @@
-/* ==========================================================================
-   MOVIES — единый index.css
-   Структура:
-     1. Tokens          7. Search
-     2. Base            8. Sign in / Log in
-     3. Header          9. Profile (билет)
-     4. Page / status  10. Verify popup
-     5. Trending       11. Mobile: ≤768 → ≤640 → ≤480 → ≤360 → landscape
-     6. Cards/Grid/Swiper  12. Reduced motion
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap");
 
-   Нужен <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-   Размер постера везде управляется одной переменной --card-width.
-   ========================================================================== */
+@property --angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
 
-
-/* ============ 1. Tokens ============ */
+/* =========================================================
+   TOKENS
+   Палитра та сама (кіно-бурштин / рубіновий / холодний промінь),
+   змінились шрифти і «світло».
+   ========================================================= */
 :root {
-    --bg: #0a0a10;
-    --surface: #17171f;
-    --surface-2: #1e1e28;
-    --text: #f4f1ee;
-    --muted: #8c8a97;
-    --accent: #ff7a3d;
-    --accent-ink: #1d0e06;
-    --accent-glow: rgba(255, 122, 61, 0.38);
+    --bg: #07070b;
+    --surface: #101018;
+    --surface-2: #181822;
+    --text: #f6f1e8;
+    --muted: #8f8c9e;
+    --accent: #ffb23e;
+    --accent-2: #ff4d6d;
+    --accent-3: #6ea8ff;
+    --accent-ink: #1a1004;
+    --accent-glow: rgba(255, 178, 62, 0.35);
     --edge: rgba(255, 255, 255, 0.08);
-    --edge-strong: rgba(255, 255, 255, 0.15);
+    --edge-strong: rgba(255, 255, 255, 0.16);
     --danger: #ff6b6b;
 
-    --gutter: 16px;
-    --card-width: clamp(108px, 18vw, 200px);
-    --radius-card: 16px;
+    --gutter: 20px;
+    --content-width: 1350px;
+    --card-width: clamp(124px, 15vw, 200px);
+    --radius-card: 12px;
 
     --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-    --glass: rgba(10, 10, 16, 0.72);
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --glass: rgba(7, 7, 11, 0.72);
+
+    /* Instrument Serif — кінематографічні заголовки (титри),
+       Onest — інтерфейс і текст (є кирилиця), JetBrains Mono — тільки код підтвердження */
+    --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+    --font-body: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 
-/* ============ 2. Base ============ */
+/* =========================================================
+   BASE
+   ========================================================= */
 * { box-sizing: border-box; }
 
 html {
     scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #2b2b3a transparent;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
 }
@@ -50,25 +61,103 @@ body {
     min-height: 100vh;
     min-height: 100dvh;
     color: var(--text);
-    font-family: "Manrope", system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
     background: var(--bg);
     overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
 }
 
-/* Фоновое свечение. Отдельный fixed-слой вместо background-attachment: fixed —
-   на iOS fixed-фон лагает и «прыгает» при скролле, а слой — нет. */
-body::before {
+/* Віньєтка залу */
+html::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background:
-            radial-gradient(900px 420px at 15% -10%, rgba(255, 122, 61, 0.12), transparent 70%),
-            radial-gradient(700px 380px at 90% 0%, rgba(90, 80, 200, 0.14), transparent 70%);
+    background: radial-gradient(ellipse 120% 90% at 50% 30%, transparent 50%, rgba(0, 0, 0, 0.62) 100%);
 }
+
+/* Пил у промені проектора */
+html::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+            radial-gradient(circle 1.8px at 20px 30px, rgba(255, 232, 190, 0.95), transparent),
+            radial-gradient(circle 1.2px at 90px 120px, rgba(255, 255, 255, 0.8), transparent),
+            radial-gradient(circle 2.4px at 160px 70px, rgba(255, 200, 120, 0.7), transparent),
+            radial-gradient(circle 1.2px at 60px 200px, rgba(190, 215, 255, 0.85), transparent);
+    background-size: 220px 260px, 310px 340px, 410px 380px, 270px 300px;
+    -webkit-mask-image: radial-gradient(ellipse 36% 85% at 50% 0%, #000 15%, transparent 75%);
+    mask-image: radial-gradient(ellipse 36% 85% at 50% 0%, #000 15%, transparent 75%);
+    animation: dust 60s linear infinite;
+}
+
+@keyframes dust {
+    from { background-position: 0 0, 0 0, 0 0, 0 0; }
+    to { background-position: 0 -260px, -310px -340px, 410px -380px, 0 -300px; }
+}
+
+/* Промінь проектора */
+body::before {
+    content: "";
+    position: fixed;
+    inset: -5% -10% 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+            radial-gradient(ellipse 70% 45% at 50% -12%, rgba(110, 168, 255, 0.24), transparent 70%),
+            conic-gradient(at 50% -10%, transparent 0deg 168deg, rgba(160, 196, 255, 0.05) 173deg, rgba(210, 228, 255, 0.17) 180deg, rgba(160, 196, 255, 0.05) 187deg, transparent 192deg 360deg),
+            radial-gradient(ellipse 50% 40% at 100% 100%, rgba(255, 77, 109, 0.1), transparent 70%),
+            radial-gradient(ellipse 40% 35% at 0% 100%, rgba(255, 178, 62, 0.06), transparent 70%);
+    transform-origin: 50% 0;
+    animation: beam 18s ease-in-out infinite alternate, flicker 9s steps(1) infinite;
+}
+
+/* Плівкове зерно */
+body::after {
+    content: "";
+    position: fixed;
+    inset: -100px;
+    z-index: 9999;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+    mix-blend-mode: overlay;
+    opacity: 0.08;
+    animation: grain 0.8s steps(5) infinite;
+}
+
+@keyframes beam {
+    from { transform: rotate(-5deg); }
+    to { transform: rotate(5deg); }
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    7% { opacity: 0.84; }
+    9% { opacity: 1; }
+    41% { opacity: 0.92; }
+    43% { opacity: 1; }
+    78% { opacity: 0.82; }
+    80% { opacity: 0.97; }
+}
+
+@keyframes grain {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-30px, 20px); }
+    40% { transform: translate(25px, -35px); }
+    60% { transform: translate(-20px, -15px); }
+    80% { transform: translate(35px, 30px); }
+    100% { transform: translate(0, 0); }
+}
+
+@keyframes angle { to { --angle: 360deg; } }
 
 a { color: inherit; text-decoration: none; }
 
@@ -78,52 +167,130 @@ button, input { font-family: inherit; }
 
 ::selection { background: var(--accent); color: var(--accent-ink); }
 
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-/* ============ 3. Header ============ */
-/* Липкая «стеклянная» шапка на всех экранах.
-   Контент выровнен по колонке 1371px, а стекло тянется на всю ширину. */
+
+/* =========================================================
+   HEADER
+   ========================================================= */
 header {
     position: sticky;
     top: 0;
     z-index: 100;
     padding:
-            calc(10px + env(safe-area-inset-top))
-            max(var(--gutter), env(safe-area-inset-right), calc((100% - 1371px) / 2))
-            10px
-            max(var(--gutter), env(safe-area-inset-left), calc((100% - 1371px) / 2));
+            calc(8px + env(safe-area-inset-top))
+            max(var(--gutter), env(safe-area-inset-right), calc((100% - var(--content-width)) / 2 + var(--gutter)))
+            8px
+            max(var(--gutter), env(safe-area-inset-left), calc((100% - var(--content-width)) / 2 + var(--gutter)));
     background: var(--glass);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
     border-bottom: 1px solid var(--edge);
 }
+
+/* Лінія-прогрес прокрутки, як смужка таймкоду */
+header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+    box-shadow: 0 0 14px rgba(255, 178, 62, 0.55);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+    header {
+        animation: header-solid linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0 160px;
+    }
+
+    header::after {
+        animation: scroll-progress linear both;
+        animation-timeline: scroll(root block);
+    }
+
+    .logo {
+        transform-origin: left center;
+        animation: logo-shrink linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0 160px;
+    }
+}
+
+@keyframes header-solid {
+    from { background: rgba(7, 7, 11, 0.3); border-bottom-color: transparent; box-shadow: 0 0 0 rgba(0, 0, 0, 0); }
+    to { background: rgba(7, 7, 11, 0.9); border-bottom-color: var(--edge); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5); }
+}
+
+@keyframes scroll-progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+@keyframes logo-shrink { to { transform: scale(0.82); } }
 
 .header_block {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    min-height: 52px;
+    gap: 16px;
+    min-height: 58px;
 }
 
 .header_block nav {
     display: flex;
     align-items: center;
+    flex: 1;
+    justify-content: flex-end;
     gap: 20px;
 }
 
-.logo { height: 52px; width: auto; }
-.logo-img { width: 40px; }
+.header_block nav > div { padding-top: 0 !important; }
+
+.header_block .search {
+    width: min(460px, 100%);
+    margin: 0;
+    padding: 0;
+    transition: width 0.5s var(--ease);
+}
+
+.header_block .search:focus-within { width: min(580px, 100%); }
+
+.header_block .search__input {
+    flex: 1;
+    width: auto !important;
+    margin: 0 !important;
+}
+
+.logo {
+    height: 38px;
+    width: auto;
+    transition: filter 0.3s ease;
+}
+
+.logo:hover { filter: drop-shadow(0 0 14px var(--accent-glow)); }
+
+.logo-img { width: 38px; }
 
 .register-img {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--edge-strong);
     border-radius: 50%;
-    transition: transform 0.2s var(--ease), box-shadow 0.2s ease;
+    transition: transform 0.45s var(--spring), border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 
-/* ============ 4. Page layout ============ */
+/* =========================================================
+   PAGE / TITLES / STATES
+   ========================================================= */
 .page {
     max-width: 1400px;
     margin: 0 auto;
@@ -132,12 +299,17 @@ header {
 
 .page__title {
     margin: 8px 0 24px;
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    font-size: clamp(32px, 4.2vw, 54px);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
 }
 
-.page__title span { color: var(--accent); }
+.page__title span {
+    color: var(--accent);
+    font-style: italic;
+}
 
 .status {
     margin: 32px 0;
@@ -150,102 +322,224 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
-    padding: 48px var(--gutter);
+    gap: 16px;
+    padding: 56px var(--gutter);
     color: var(--muted);
     font-size: 14px;
+    font-weight: 600;
 }
 
+/* Спінер — барабан кіноплівки */
 .spinner {
-    width: 44px;
-    height: 44px;
-    border: 3px solid var(--edge);
-    border-top-color: var(--accent);
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    filter: drop-shadow(0 0 8px var(--accent-glow));
-    animation: spin 0.8s linear infinite;
+    background:
+            radial-gradient(circle at 50% 50%, var(--bg) 0 5.5px, transparent 6px),
+            radial-gradient(circle at 50% 20%, var(--bg) 0 4.5px, transparent 5px),
+            radial-gradient(circle at 76% 35%, var(--bg) 0 4.5px, transparent 5px),
+            radial-gradient(circle at 76% 65%, var(--bg) 0 4.5px, transparent 5px),
+            radial-gradient(circle at 50% 80%, var(--bg) 0 4.5px, transparent 5px),
+            radial-gradient(circle at 24% 65%, var(--bg) 0 4.5px, transparent 5px),
+            radial-gradient(circle at 24% 35%, var(--bg) 0 4.5px, transparent 5px),
+            conic-gradient(var(--accent), #ffd89a, var(--accent), #ffd89a, var(--accent));
+    box-shadow: 0 0 0 2px rgba(255, 178, 62, 0.25), 0 0 32px rgba(255, 178, 62, 0.3);
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
 
-/* ============ 5. Trending header + переключатель День/Неделя ============ */
+/* =========================================================
+   TRENDING + МАРКІЗА
+   ========================================================= */
+.trending { margin-top: 36px; }
+
 .trending__header {
+    position: relative;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 0 var(--gutter);
+    gap: 14px;
+    padding: 0 var(--gutter) 28px;
+}
+
+/* Лампочки маркізи, що перемигуються по черзі */
+.trending__header::before,
+.trending__header::after {
+    content: "";
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: 4px;
+    height: 8px;
+    background: radial-gradient(circle at 50% 50%, #fff2d2 0 1.4px, var(--accent) 2.4px, rgba(255, 178, 62, 0.35) 3.4px, transparent 4.6px) 0 0 / 24px 8px repeat-x;
+    filter: drop-shadow(0 0 6px rgba(255, 178, 62, 0.85));
+    pointer-events: none;
+}
+
+.trending__header::before { animation: bulb-off 1.6s steps(1) infinite; }
+
+.trending__header::after {
+    background-position: 12px 0;
+    animation: bulb-on 1.6s steps(1) infinite;
+}
+
+@keyframes bulb-on {
+    0% { opacity: 1; }
+    50% { opacity: 0.18; }
+}
+
+@keyframes bulb-off {
+    0% { opacity: 0.18; }
+    50% { opacity: 1; }
 }
 
 .trending__header h2,
-.trending h2 {
-    margin: 0;
-    font-size: 30px;
-    font-weight: 800;
+.trending h2,
+.profile__favorites h2 {
+    margin: 0 auto 0 0;
+    color: #e8e2d8;
+    font-family: var(--font-display);
+    font-size: clamp(44px, 6.4vw, 92px);
+    font-weight: 400;
+    line-height: 0.95;
     letter-spacing: -0.02em;
+    text-wrap: balance;
+}
+
+.trending__header h2,
+.trending h2 { order: -1; }
+
+/* Єдиний «виставлений» момент на сторінці: світловий відблиск пробігає по титрах */
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+    .trending__header h2,
+    .trending h2,
+    .profile__favorites h2 {
+        background: linear-gradient(100deg, #e8e2d8 0 38%, #ffc15a 46%, #ffffff 50%, #ffc15a 54%, #e8e2d8 62% 100%) 100% 0 / 300% 100% no-repeat;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        animation: title-sweep 2.8s var(--ease) 0.2s both;
+    }
+}
+
+@keyframes title-sweep {
+    from { background-position: 100% 0; }
+    to { background-position: 0 0; }
 }
 
 .buttons {
     display: inline-flex;
-    gap: 2px;
+    gap: 4px;
     margin: 0;
     padding: 4px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--edge);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .buttons button {
     appearance: none;
     border: 0;
-    padding: 8px 18px;
+    padding: 8px 20px;
     border-radius: 999px;
-    background: transparent;
+    background: linear-gradient(var(--accent), var(--accent)) 50% 100% / 0 2px no-repeat;
     color: var(--muted);
     font: inherit;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
+    text-transform: capitalize;
     cursor: pointer;
-    transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    transition: color 0.25s ease, background-color 0.25s ease, background-size 0.35s var(--ease), box-shadow 0.3s ease;
 }
 
-.buttons button:hover { color: var(--text); }
+.buttons button:hover {
+    color: var(--text);
+    background-size: 60% 2px;
+}
 
 .buttons button:disabled,
 .buttons button.active,
 .buttons button[aria-pressed="true"] {
     background: var(--accent);
     color: var(--accent-ink);
+    font-weight: 700;
     cursor: default;
-    box-shadow: 0 4px 16px var(--accent-glow);
+    box-shadow: 0 0 24px var(--accent-glow);
 }
 
 .buttons button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 
 
-/* ============ 6a. Горизонтальная лента ============ */
+/* =========================================================
+   КІНОСТРІЧКА
+   ========================================================= */
 .movie-list {
-    display: flex;
-    gap: 24px;
-    padding: 28px var(--gutter) 48px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding: 0 var(--gutter);
-    overscroll-behavior-x: contain;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--gutter), #000 calc(100% - 56px), transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0, #000 var(--gutter), #000 calc(100% - 56px), transparent 100%);
+    position: relative;
+    display: block;
+    padding: 46px var(--gutter);
+    overflow: hidden;
+    background:
+            radial-gradient(260px 180px at 0% 50%, rgba(255, 178, 62, 0.1), transparent 70%),
+            radial-gradient(260px 180px at 100% 50%, rgba(255, 77, 109, 0.09), transparent 70%),
+            linear-gradient(180deg, #05050a, #0a0a11 50%, #05050a);
+    border-block: 1px solid var(--edge);
+    border-radius: 6px;
 }
 
-.movie-list::-webkit-scrollbar { display: none; }
+/* Перфорація плівки */
+.movie-list::before,
+.movie-list::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    height: 16px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='16'%3E%3Crect x='8' y='4' width='12' height='8' rx='2.5' fill='%23ffd89a' fill-opacity='.24'/%3E%3C/svg%3E") 0 0 / 28px 16px repeat-x;
+    pointer-events: none;
+    animation: film-roll 3s linear infinite paused;
+}
+
+.movie-list::before { top: 14px; }
+.movie-list::after { bottom: 14px; }
+
+.movie-list:hover::before,
+.movie-list:hover::after { animation-play-state: running; }
+
+@keyframes film-roll { to { background-position-x: -28px; } }
+
+@keyframes film-fwd {
+    from { background-position-x: 0; }
+    to { background-position-x: -336px; }
+}
+
+@keyframes film-back {
+    from { background-position-x: -336px; }
+    to { background-position-x: 0; }
+}
+
+/* Плівка прокручується разом зі скролом сторінки */
+@supports (animation-timeline: view()) {
+    .movie-list::before,
+    .movie-list::after {
+        animation: film-fwd linear both;
+        animation-timeline: view();
+        animation-range: cover 0% cover 100%;
+    }
+
+    .movie-list::after { animation-name: film-back; }
+}
 
 
-/* ============ 6b. Карточка фильма ============ */
+/* =========================================================
+   КАРТКИ ФІЛЬМІВ
+   ========================================================= */
 .movie-block {
     position: relative;
     flex: 0 0 auto;
@@ -256,20 +550,33 @@ header {
     isolation: isolate;
     scroll-snap-align: start;
     background: var(--surface);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-    transition: transform 0.35s var(--ease), box-shadow 0.35s ease;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
     cursor: pointer;
+    transition: transform 0.55s var(--spring), box-shadow 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
 }
 
-/* тонкая внутренняя рамка поверх постера */
+/* Голографічний відблиск */
+.movie-block::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.2) 42%, rgba(255, 178, 62, 0.3) 48%, rgba(255, 77, 109, 0.22) 54%, rgba(110, 168, 255, 0.26) 60%, transparent 72%) 130% 0 / 260% 100% no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+    transition: background-position 0.9s var(--ease), opacity 0.3s ease;
+}
+
 .movie-block::after {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    box-shadow: inset 0 0 0 1px var(--edge);
+    box-shadow: inset 0 0 0 1px var(--edge-strong);
     pointer-events: none;
-    z-index: 3;
+    z-index: 4;
+    transition: box-shadow 0.3s ease;
 }
 
 .movie-block img {
@@ -277,11 +584,16 @@ header {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.6s var(--ease);
+    animation: develop 1.3s var(--ease) calc(var(--i, 0) * 70ms) both;
 }
 
-/* Название: по умолчанию ВСЕГДА видно (на тач-экранах hover'а нет).
-   На устройствах с мышью прячется и появляется по наведению — см. блок ниже. */
+/* Плівка «проявляється» */
+@keyframes develop {
+    0% { filter: grayscale(1) sepia(0.6) contrast(1.6) brightness(0.3) blur(8px); transform: scale(1.14); }
+    55% { filter: grayscale(0.6) sepia(0.4) contrast(1.25) brightness(0.8) blur(2px); }
+    100% { filter: none; transform: scale(1); }
+}
+
 .movie-block p {
     position: absolute;
     left: 0;
@@ -289,58 +601,80 @@ header {
     bottom: 0;
     z-index: 2;
     margin: 0;
-    padding: 48px 12px 13px;
+    padding: 64px 14px 14px;
     color: #fff;
     font-size: 14px;
     font-weight: 700;
     line-height: 1.3;
-    background: linear-gradient(to top, rgba(8, 8, 14, 0.95) 12%, transparent);
+    letter-spacing: -0.005em;
+    background: linear-gradient(to top, rgba(5, 5, 9, 0.97) 14%, rgba(5, 5, 9, 0.6) 55%, transparent);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     pointer-events: none;
+    transition: transform 0.4s var(--ease), color 0.3s ease;
 }
 
-.movie-block:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.movie-block:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
-/* Hover только для мыши — на телефоне он «залипает» после тапа */
+.swiper-slide:nth-child(1) .movie-block, .movie-cart > .movie-block:nth-child(1), .movies-grid > .movie-block:nth-child(1) { --i: 0; }
+.swiper-slide:nth-child(2) .movie-block, .movie-cart > .movie-block:nth-child(2), .movies-grid > .movie-block:nth-child(2) { --i: 1; }
+.swiper-slide:nth-child(3) .movie-block, .movie-cart > .movie-block:nth-child(3), .movies-grid > .movie-block:nth-child(3) { --i: 2; }
+.swiper-slide:nth-child(4) .movie-block, .movie-cart > .movie-block:nth-child(4), .movies-grid > .movie-block:nth-child(4) { --i: 3; }
+.swiper-slide:nth-child(5) .movie-block, .movie-cart > .movie-block:nth-child(5), .movies-grid > .movie-block:nth-child(5) { --i: 4; }
+.swiper-slide:nth-child(6) .movie-block, .movie-cart > .movie-block:nth-child(6), .movies-grid > .movie-block:nth-child(6) { --i: 5; }
+.swiper-slide:nth-child(7) .movie-block, .movie-cart > .movie-block:nth-child(7), .movies-grid > .movie-block:nth-child(7) { --i: 6; }
+.swiper-slide:nth-child(8) .movie-block, .movie-cart > .movie-block:nth-child(8), .movies-grid > .movie-block:nth-child(8) { --i: 7; }
+.swiper-slide:nth-child(9) .movie-block, .movie-cart > .movie-block:nth-child(9), .movies-grid > .movie-block:nth-child(9) { --i: 8; }
+.swiper-slide:nth-child(10) .movie-block, .movie-cart > .movie-block:nth-child(10), .movies-grid > .movie-block:nth-child(10) { --i: 9; }
+.swiper-slide:nth-child(11) .movie-block, .movie-cart > .movie-block:nth-child(11), .movies-grid > .movie-block:nth-child(11) { --i: 10; }
+.swiper-slide:nth-child(12) .movie-block, .movie-cart > .movie-block:nth-child(12), .movies-grid > .movie-block:nth-child(12) { --i: 11; }
+
 @media (hover: hover) and (pointer: fine) {
-    .movie-block p {
-        opacity: 0;
-        transform: translateY(10px);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    /* блик, пробегающий по постеру */
-    .movie-block::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: 2;
-        background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.14) 50%, transparent 65%);
-        transform: translateX(-120%);
-        transition: transform 0.8s var(--ease);
-        pointer-events: none;
-    }
-
     .movie-block:hover,
     .movie-block:focus-visible {
-        box-shadow: 0 18px 44px var(--accent-glow), 0 6px 16px rgba(0, 0, 0, 0.6);
+        z-index: 6;
+        transform: perspective(900px) translateY(-12px) rotateX(5deg) rotateY(-8deg) scale(1.05);
+        box-shadow: 0 34px 60px rgba(0, 0, 0, 0.78), 0 0 54px rgba(255, 178, 62, 0.26);
     }
 
-
+    .swiper-slide:nth-child(even) .movie-block:hover,
+    .swiper-slide:nth-child(even) .movie-block:focus-visible {
+        transform: perspective(900px) translateY(-12px) rotateX(5deg) rotateY(8deg) scale(1.05);
+    }
 
     .movie-block:hover::before,
-    .movie-block:focus-visible::before { transform: translateX(120%); }
+    .movie-block:focus-visible::before {
+        opacity: 1;
+        background-position: -30% 0;
+    }
+
+    .movie-block:hover::after,
+    .movie-block:focus-visible::after { box-shadow: inset 0 0 0 1px rgba(255, 178, 62, 0.9), inset 0 -40px 40px -30px rgba(255, 178, 62, 0.25); }
 
     .movie-block:hover p,
-    .movie-block:focus-visible p { opacity: 1; transform: translateY(0); }
+    .movie-block:focus-visible p {
+        transform: translateY(-4px);
+        color: #ffe3ad;
+    }
 
-    .register-img:hover { box-shadow: 0 0 0 2px var(--accent); }
+    /* Решта афіш гасне, як у залі перед сеансом */
+    .swiper-wrapper:has(.movie-block:hover) .movie-block:not(:hover),
+    .movie-cart:has(.movie-block:hover) .movie-block:not(:hover),
+    .movies-grid:has(.movie-block:hover) .movie-block:not(:hover) {
+        opacity: 0.4;
+        filter: saturate(0.35) brightness(0.7);
+        transform: scale(0.96);
+    }
+
+    .register-img:hover {
+        transform: scale(1.1) rotate(8deg);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(255, 178, 62, 0.16), 0 0 26px var(--accent-glow);
+    }
 }
 
-/* Карточка без постера (.no-poster оставлен для старой разметки) */
 .movie-block__empty,
 .no-poster {
     display: flex;
@@ -354,30 +688,42 @@ header {
     color: var(--muted);
     font-size: 13px;
     font-weight: 700;
-    background: linear-gradient(160deg, rgba(255, 122, 61, 0.12), transparent 60%), var(--surface);
+    background: repeating-linear-gradient(135deg, #14141c 0 10px, #101017 10px 20px);
 }
 
 
-/* ============ 6c. Сетки (.movie-cart — алиас) ============ */
+/* =========================================================
+   СІТКИ / SWIPER
+   ========================================================= */
 .movies-grid,
 .movie-cart {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 24px;
+    gap: 28px 24px;
 }
 
 .movies-grid .movie-block,
 .movie-cart .movie-block { width: 100%; }
 
-
-/* ============ 6d. Swiper ============ */
-.swiper {
-    --swiper-theme-color: var(--accent);
-    --swiper-navigation-size: 20px;
-    padding: 24px var(--gutter) 48px;
+/* Афіші в гріді піднімаються з темряви під час прокрутки */
+@supports (animation-timeline: view()) {
+    .movies-grid .movie-block,
+    .movie-cart .movie-block {
+        animation: card-rise linear backwards;
+        animation-timeline: view();
+        animation-range: entry 0% entry 70%;
+    }
 }
 
-/* ширина слайда — из CSS (нужен slidesPerView="auto"); !important перебивает inline-ширину Swiper */
+@keyframes card-rise { from { translate: 0 44px; } }
+
+.swiper {
+    --swiper-theme-color: var(--accent);
+    --swiper-navigation-size: 16px;
+    margin-inline: -10px;
+    padding: 14px 10px;
+}
+
 .swiper-slide {
     width: var(--card-width) !important;
     height: auto;
@@ -387,20 +733,25 @@ header {
 
 .swiper-button-next,
 .swiper-button-prev {
-    width: 44px;
-    height: 44px;
+    top: calc(var(--card-width) * 0.75 + 14px);
+    width: 46px;
+    height: 46px;
+    margin-top: -23px;
     border-radius: 50%;
-    background: rgba(10, 10, 16, 0.7);
-    border: 1px solid var(--edge);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    transition: background 0.2s ease, transform 0.2s ease;
+    background: var(--glass);
+    border: 1px solid var(--edge-strong);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition: transform 0.4s var(--spring), background 0.25s ease, border-color 0.25s ease, box-shadow 0.3s ease;
 }
 
 .swiper-button-next:hover,
 .swiper-button-prev:hover {
-    background: var(--accent);
     --swiper-navigation-color: var(--accent-ink);
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px var(--accent-glow);
+    transform: scale(1.12);
 }
 
 .swiper-button-disabled { opacity: 0; pointer-events: none; }
@@ -409,11 +760,13 @@ header {
 .swiper-pagination-bullet-active { background: var(--accent); opacity: 1; }
 
 
-/* ============ 7. Search ============ */
+/* =========================================================
+   ПОШУК
+   ========================================================= */
 .search {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     max-width: 720px;
     margin: 0 auto;
     padding: 0 0 10px;
@@ -422,68 +775,76 @@ header {
 .search__input {
     flex: 1;
     min-width: 0;
-    height: 48px;
-    padding: 0 20px 0 48px;
-    border: 1px solid var(--edge);
+    height: 44px;
+    padding: 0 18px 0 46px;
+    border: 1px solid transparent;
     border-radius: 999px;
-    background-color: rgba(255, 255, 255, 0.06);
-    /* ВАЖНО: xmlns должен быть http://www.w3.org/2000/svg — иначе иконка лупы не рисуется */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238c8a97' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: 18px center;
+    background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238d8a9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E"),
+            linear-gradient(var(--surface), var(--surface)),
+            linear-gradient(var(--edge-strong), var(--edge-strong));
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-size: 18px 18px, 100% 100%, 100% 100%;
+    background-position: 17px center, 0 0, 0 0;
+    background-origin: padding-box, padding-box, border-box;
+    background-clip: padding-box, padding-box, border-box;
     color: var(--text);
     font: inherit;
     font-size: 15px;
-    font-weight: 600;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    font-weight: 500;
+    transition: box-shadow 0.3s ease;
 }
 
-.search__input::placeholder { color: var(--muted); font-weight: 500; }
-.search__input:hover { background-color: rgba(255, 255, 255, 0.09); }
+.search__input::placeholder { color: var(--muted); font-weight: 400; }
 
 .search__input:focus {
     outline: none;
-    border-color: var(--accent);
-    background-color: rgba(255, 255, 255, 0.09);
-    box-shadow: 0 0 0 4px var(--accent-glow);
+    background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23ffb23e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E"),
+            linear-gradient(var(--surface-2), var(--surface-2)),
+            conic-gradient(from var(--angle), var(--accent), var(--accent-2), var(--accent-3), var(--accent));
+    box-shadow: 0 0 0 6px rgba(255, 178, 62, 0.08), 0 12px 40px rgba(255, 178, 62, 0.14);
+    animation: angle 3.5s linear infinite;
 }
 
-/* Основная кнопка: поиск + формы */
 .search__button,
 .register-form button[type="submit"] {
     appearance: none;
     flex-shrink: 0;
     border: 0;
-    background: var(--accent);
+    background: linear-gradient(110deg, var(--accent) 0 38%, #ffe3ad 50%, var(--accent) 62% 100%) 100% 0 / 260% 100% no-repeat;
     color: var(--accent-ink);
     font: inherit;
     font-size: 15px;
-    font-weight: 800;
+    font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 6px 20px var(--accent-glow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    box-shadow: 0 8px 26px var(--accent-glow);
+    transition: transform 0.4s var(--spring), box-shadow 0.3s ease, background-position 0.8s var(--ease);
 }
 
-.search__button { height: 48px; padding: 0 26px; border-radius: 999px; }
+.search__button {
+    height: 44px;
+    padding: 0 26px;
+    border-radius: 999px;
+    text-transform: capitalize;
+}
 
 .register-form button[type="submit"] {
     width: 100%;
-    height: 50px;
+    height: 52px;
     margin-top: 8px;
     border-radius: 14px;
     text-transform: capitalize;
 }
 
 .search__button:active,
-.register-form button[type="submit"]:active { }
+.register-form button[type="submit"]:active { transform: scale(0.97); }
 
 .search__button:focus-visible,
 .register-form button[type="submit"]:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
 .register-form button[type="submit"]:disabled {
-    opacity: 0.55;
+    opacity: 0.5;
     cursor: not-allowed;
     box-shadow: none;
 }
@@ -492,19 +853,21 @@ header {
     .search__button:hover,
     .register-form button[type="submit"]:hover:not(:disabled) {
         transform: translateY(-2px);
-        filter: brightness(1.08);
-        box-shadow: 0 10px 28px var(--accent-glow);
+        background-position: 0 0;
+        box-shadow: 0 14px 34px var(--accent-glow);
     }
 }
 
 
-/* ============ 8. Sign in / Log in ============ */
+/* =========================================================
+   РЕЄСТРАЦІЯ / ВХІД
+   ========================================================= */
 .register-page {
     display: flex;
     justify-content: center;
     align-items: flex-start;
     gap: 32px;
-    padding: 40px var(--gutter) 0;
+    padding: 48px var(--gutter) 0;
 }
 
 .register-block,
@@ -514,32 +877,28 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 28px 0;
-    border-radius: 24px;
+    padding: 36px 0;
+    border: 1px solid transparent;
+    border-radius: 22px;
     background:
-            radial-gradient(320px 160px at 10% -10%, rgba(255, 122, 61, 0.1), transparent 70%),
-            linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
-            var(--surface);
-    border: 1px solid var(--edge);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.register-block:hover,
-.log-in-block:hover {
-    border-color: var(--edge-strong);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            radial-gradient(360px 200px at 10% -10%, rgba(255, 178, 62, 0.1), transparent 70%) padding-box,
+            radial-gradient(340px 200px at 100% 0%, rgba(110, 168, 255, 0.1), transparent 70%) padding-box,
+            linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)) padding-box,
+            linear-gradient(var(--surface), var(--surface)) padding-box,
+            conic-gradient(from var(--angle), var(--edge) 0deg 240deg, var(--accent) 300deg, var(--accent-2) 335deg, var(--edge) 360deg) border-box;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+    animation: angle 7s linear infinite;
 }
 
 .register-block h1,
 .log-in-block h1 {
-    width: fit-content;
+    width: 80%;
     margin: 0 0 28px;
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.015em;
     text-transform: capitalize;
 }
 
@@ -552,42 +911,46 @@ header {
 .register-form label {
     margin-bottom: 8px;
     font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
+    font-weight: 600;
+    letter-spacing: 0.01em;
     text-transform: capitalize;
     color: var(--muted);
-    transition: color 0.2s ease;
+    transition: color 0.25s ease, transform 0.3s var(--ease);
 }
 
-.register-form label:has(+ input:focus) { color: var(--accent); }
+.register-form label:has(+ input:focus) {
+    color: var(--accent);
+    transform: translateX(4px);
+}
 
 .register-form input {
     width: 100%;
-    height: 48px;
+    height: 50px;
     margin-bottom: 20px;
     padding: 0 18px;
     border: 1px solid var(--edge);
     border-radius: 14px;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.04);
     color: var(--text);
     font: inherit;
     font-size: 15px;
-    font-weight: 600;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    font-weight: 500;
+    transition: border-color 0.25s ease, box-shadow 0.3s ease, background-color 0.25s ease, transform 0.3s var(--ease);
 }
 
-.register-form input::placeholder { color: var(--muted); font-weight: 500; }
+.register-form input::placeholder { color: var(--muted); font-weight: 400; }
 
 .register-form input:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.07);
     border-color: var(--edge-strong);
 }
 
 .register-form input:focus {
     outline: none;
     border-color: var(--accent);
-    background-color: rgba(255, 255, 255, 0.09);
-    box-shadow: 0 0 0 4px var(--accent-glow);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 4px rgba(255, 178, 62, 0.14), 0 10px 30px rgba(255, 178, 62, 0.1);
+    transform: translateY(-2px);
 }
 
 .register-form input:-webkit-autofill,
@@ -599,25 +962,50 @@ header {
     transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Ошибка валидации. Лучше <p className="form-error">; .register-form p — запасной вариант для старой разметки */
 .form-error,
 .register-form p {
     margin: -6px 0 18px;
     padding: 10px 14px;
     border-radius: 10px;
-    background: rgba(255, 77, 77, 0.12);
-    border: 1px solid rgba(255, 77, 77, 0.3);
-    color: var(--danger);
+    background: rgba(255, 77, 109, 0.12);
+    border: 1px solid rgba(255, 77, 109, 0.35);
+    color: #ff8a9d;
     font-size: 13px;
     font-weight: 600;
+    animation: shake 0.45s var(--ease);
+}
+
+@keyframes shake {
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
 }
 
 
-/* ============ 9. Profile — билет в кино ============ */
+/* =========================================================
+   ПРОФІЛЬ — КВИТОК З ФОЛЬГОЮ
+   ========================================================= */
 .profile {
+    position: relative;
+    isolation: isolate;
     max-width: 1100px;
     margin: 0 auto;
     padding: 20px var(--gutter) 64px;
+}
+
+/* Тепле сяйво під квитком */
+.profile::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 30px;
+    left: 12%;
+    right: 12%;
+    height: 220px;
+    background: radial-gradient(ellipse at 50% 50%, rgba(255, 178, 62, 0.28), rgba(255, 77, 109, 0.1) 55%, transparent 75%);
+    filter: blur(50px);
+    pointer-events: none;
 }
 
 .profile__header {
@@ -630,9 +1018,13 @@ header {
     gap: 24px;
     padding: 32px 0 32px 36px;
     background:
-            radial-gradient(420px 220px at 0% 0%, rgba(255, 122, 61, 0.16), transparent 70%),
+            linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.09) 50%, transparent 58%) 160% 0 / 260% 100% no-repeat,
+            linear-gradient(90deg, transparent calc(100% - var(--stub)), rgba(255, 178, 62, 0.08) calc(100% - var(--stub))),
+            radial-gradient(420px 220px at 0% 0%, rgba(255, 178, 62, 0.2), transparent 70%),
+            radial-gradient(380px 220px at 70% 120%, rgba(110, 168, 255, 0.14), transparent 70%),
             var(--surface);
     border-radius: 24px;
+    animation: ticket-shine 7s ease-in-out 1.2s infinite;
     -webkit-mask:
             radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 0, #0000 98%, #000) top / 100% 51% no-repeat,
             radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
@@ -641,35 +1033,56 @@ header {
             radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
 }
 
-/* линия отрыва */
+/* Фольгований відблиск раз на кілька секунд */
+@keyframes ticket-shine {
+    0%, 55% { background-position: 160% 0, 0 0, 0 0, 0 0; }
+    100% { background-position: -60% 0, 0 0, 0 0, 0 0; }
+}
+
 .profile__header::after {
     content: "";
     position: absolute;
     top: var(--notch);
     bottom: var(--notch);
     right: var(--stub);
-    border-left: 2px dashed var(--edge);
+    border-left: 2px dashed var(--edge-strong);
+    pointer-events: none;
+}
+
+/* Штрих-код корінця */
+.profile__header::before {
+    content: "";
+    position: absolute;
+    top: 24px;
+    right: calc((var(--stub) - 104px) / 2);
+    width: 104px;
+    height: 22px;
+    background: repeating-linear-gradient(90deg, rgba(243, 239, 233, 0.6) 0 2px, transparent 2px 4px, rgba(243, 239, 233, 0.6) 4px 5px, transparent 5px 8px, rgba(243, 239, 233, 0.6) 8px 11px, transparent 11px 13px);
     pointer-events: none;
 }
 
 .profile__avatar {
-    width: 88px;
-    height: 88px;
+    width: 92px;
+    height: 92px;
+    border: 3px solid transparent;
     border-radius: 50%;
     object-fit: cover;
-    background: var(--bg);
-    border: 3px solid var(--accent);
-    box-shadow: 0 8px 28px var(--accent-glow);
+    background:
+            linear-gradient(var(--bg), var(--bg)) padding-box,
+            conic-gradient(from var(--angle), var(--accent), var(--accent-2), var(--accent-3), var(--accent)) border-box;
+    box-shadow: 0 10px 34px rgba(255, 178, 62, 0.28);
+    animation: angle 5s linear infinite;
 }
 
 .profile__info { min-width: 0; }
 
 .profile__name {
     margin: 0 0 6px;
-    font-size: clamp(28px, 4vw, 40px);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.4vw, 54px);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1;
     overflow-wrap: anywhere;
 }
 
@@ -677,56 +1090,44 @@ header {
     margin: 0;
     color: var(--muted);
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 500;
     overflow-wrap: anywhere;
 }
 
 .profile__logout {
     justify-self: center;
     appearance: none;
-    padding: 10px 24px;
-    border: 1px solid var(--edge);
+    margin-top: 30px;
+    padding: 11px 26px;
+    border: 1px solid var(--edge-strong);
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.05);
     color: var(--text);
     font: inherit;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.4s var(--spring);
 }
 
 .profile__logout:hover,
 .profile__logout:active {
     background: var(--danger);
     border-color: var(--danger);
-    color: var(--accent-ink);
+    color: #1a0606;
+    transform: scale(1.06);
 }
 
 .profile__logout:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
-/* Избранное */
-.profile__favorites { margin-top: 48px; }
+.profile__favorites { margin-top: 64px; }
 
-.profile__favorites h2 {
-    margin: 0 0 20px;
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-}
+.profile__favorites h2 { margin: 0 0 26px; }
 
-/* Здесь .movie-list — обычная сетка, а не лента с главной */
 .profile .movie-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 20px;
+    display: block;
     margin: 0;
-    padding: 0;
-    overflow: visible;
-    scroll-snap-type: none;
     list-style: none;
-    -webkit-mask-image: none;
-    mask-image: none;
 }
 
 .movie-card {
@@ -737,7 +1138,7 @@ header {
     border: 1px solid var(--edge);
     border-radius: 16px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s var(--ease), box-shadow 0.3s ease;
+    transition: transform 0.4s var(--spring), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .movie-card img {
@@ -759,7 +1160,7 @@ header {
     margin: 0 14px 14px;
     color: var(--muted);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .movie-card button {
@@ -772,35 +1173,37 @@ header {
     color: var(--danger);
     font: inherit;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .movie-card button:hover,
-.movie-card button:active { background: var(--danger); color: var(--accent-ink); }
+.movie-card button:active { background: var(--danger); color: #1a0606; }
 .movie-card button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 
 @media (hover: hover) and (pointer: fine) {
     .movie-card:hover {
         transform: translateY(-6px);
-        box-shadow: 0 18px 44px var(--accent-glow), 0 6px 16px rgba(0, 0, 0, 0.6);
+        border-color: rgba(255, 178, 62, 0.4);
+        box-shadow: 0 22px 50px rgba(255, 178, 62, 0.2), 0 6px 16px rgba(0, 0, 0, 0.6);
     }
 }
 
 .profile__empty {
     margin: 0;
     padding: 56px 20px;
-    border: 2px dashed var(--edge);
+    border: 2px dashed var(--edge-strong);
     border-radius: 20px;
     color: var(--muted);
-    font-weight: 600;
+    font-weight: 500;
     text-align: center;
 }
 
 
-/* ============ 10. Verify popup ============ */
-/* Оверлей: затемняет страницу, блокирует клики, центрирует карточку */
+/* =========================================================
+   ПОПАП ПІДТВЕРДЖЕННЯ EMAIL
+   ========================================================= */
 .verify-popup {
     position: fixed;
     inset: 0;
@@ -811,32 +1214,35 @@ header {
     padding: var(--gutter);
     overflow-y: auto;
     overscroll-behavior: contain;
-    background: rgba(10, 10, 16, 0.72);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
-    animation: verify-fade 0.2s ease-out;
+    background: rgba(4, 4, 8, 0.76);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    animation: verify-fade 0.25s ease-out;
 }
 
 .verify-popup__card {
     width: 100%;
-    max-width: 380px;
+    max-width: 400px;
     margin: auto;
-    padding: 28px 24px 24px;
+    padding: 32px 24px 24px;
     color: var(--text);
+    border: 1px solid transparent;
+    border-radius: 22px;
     background:
-            radial-gradient(260px 140px at 15% -10%, rgba(255, 122, 61, 0.14), transparent 70%),
-            var(--surface);
-    border: 1px solid var(--edge);
-    border-radius: 20px;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-    animation: verify-rise 0.25s ease-out;
+            radial-gradient(260px 140px at 15% -10%, rgba(255, 178, 62, 0.16), transparent 70%) padding-box,
+            linear-gradient(var(--surface), var(--surface)) padding-box,
+            conic-gradient(from var(--angle), var(--edge) 0deg 250deg, var(--accent) 310deg, var(--accent-2) 340deg, var(--edge) 360deg) border-box;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+    animation: verify-rise 0.5s var(--spring), angle 6s linear infinite;
 }
 
 .verify-popup__title {
-    margin: 0 0 22px;
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1.4;
+    margin: 0 0 24px;
+    font-family: var(--font-display);
+    font-size: 27px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.005em;
     text-align: center;
     color: var(--text);
     overflow-wrap: anywhere;
@@ -844,9 +1250,11 @@ header {
 
 .verify-popup__email {
     display: block;
-    margin-top: 4px;
-    font-size: 16px;
+    margin-top: 6px;
+    font-family: var(--font-body);
+    font-size: 15px;
     font-weight: 600;
+    letter-spacing: 0;
     color: var(--accent);
 }
 
@@ -858,57 +1266,59 @@ header {
 
 .verify-popup__input {
     width: 100%;
-    height: 52px;
+    height: 58px;
     padding: 0 16px;
-    font: inherit;
-    font-size: 18px;
+    font-family: var(--font-mono);
+    font-size: 22px;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.3em;
     text-align: center;
     color: var(--text);
+    caret-color: var(--accent);
     background: var(--bg);
-    border: 1px solid var(--edge);
-    border-radius: 12px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--edge-strong);
+    border-radius: 14px;
+    transition: border-color 0.25s ease, box-shadow 0.3s ease;
 }
 
 .verify-popup__input::placeholder {
     color: var(--muted);
-    font-weight: 500;
-    letter-spacing: normal;
+    font-weight: 700;
+    letter-spacing: 0.1em;
 }
 
 .verify-popup__input:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
+    box-shadow: 0 0 0 4px rgba(255, 178, 62, 0.16), 0 0 34px rgba(255, 178, 62, 0.14);
 }
 
 .verify-popup__button {
     appearance: none;
-    height: 50px;
+    height: 52px;
     padding: 0 16px;
     font: inherit;
     font-size: 15px;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--accent-ink);
     background: var(--accent);
     border: 0;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px var(--accent-glow);
+    border-radius: 14px;
+    box-shadow: 0 8px 26px var(--accent-glow);
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    transition: transform 0.4s var(--spring), box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 .verify-popup__button:hover:not(:disabled) {
     filter: brightness(1.08);
-    box-shadow: 0 10px 30px var(--accent-glow);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px var(--accent-glow);
 }
 
-.verify-popup__button:active:not(:disabled) { transform: translateY(1px); }
+.verify-popup__button:active:not(:disabled) { transform: scale(0.97); }
 
 .verify-popup__button:disabled {
-    opacity: 0.55;
+    opacity: 0.5;
     cursor: not-allowed;
     box-shadow: none;
 }
@@ -919,79 +1329,243 @@ header {
     margin: 14px 0 0;
     padding: 10px 14px;
     border-radius: 10px;
-    background: rgba(255, 77, 77, 0.12);
-    border: 1px solid rgba(255, 77, 77, 0.3);
-    color: var(--danger);
+    background: rgba(255, 77, 109, 0.12);
+    border: 1px solid rgba(255, 77, 109, 0.35);
+    color: #ff8a9d;
     font-size: 13px;
     font-weight: 600;
     text-align: center;
+    animation: shake 0.45s var(--ease);
+}
+
+.buttons-verify {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.buttons-verify button { flex: 1; width: auto; }
+
+.cancel-popup__button {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    box-shadow: none;
+}
+
+.cancel-popup__button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: none;
 }
 
 @keyframes verify-fade {
     from { opacity: 0; }
-    to   { opacity: 1; }
+    to { opacity: 1; }
 }
 
 @keyframes verify-rise {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(40px) scale(0.92); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes verify-sheet {
     from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
+    to { transform: translateY(0); }
 }
 
 
-/* ==========================================================================
-   11. MOBILE
-   Всё ниже — только внутри media-запросов, десктоп не затрагивается.
-   Порядок важен: от большего брейкпоинта к меньшему.
-   ========================================================================== */
+/* =========================================================
+   УСПІХ
+   ========================================================= */
+.register-cart {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--gutter);
+    background: rgba(4, 4, 8, 0.76);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: fade-in 0.25s var(--ease);
+}
 
-/* ---------- Тач-устройства ---------- */
+.success-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 24px 28px;
+    text-align: center;
+    color: var(--text);
+    background:
+            radial-gradient(280px 160px at 50% -10%, rgba(255, 178, 62, 0.22), transparent 70%),
+            var(--surface);
+    border: 1px solid var(--edge-strong);
+    border-radius: 22px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), 0 0 60px rgba(255, 178, 62, 0.14);
+    animation: pop-in 0.55s var(--spring);
+}
+
+.success-icon {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent-ink);
+    background: var(--accent);
+    border-radius: 50%;
+    animation: ripple 1.8s ease-out infinite;
+}
+
+@keyframes ripple {
+    0% { box-shadow: 0 0 0 0 rgba(255, 178, 62, 0.55), 0 0 24px var(--accent-glow); }
+    100% { box-shadow: 0 0 0 26px rgba(255, 178, 62, 0), 0 0 24px var(--accent-glow); }
+}
+
+.success-card h1 {
+    margin: 0 0 8px;
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text);
+}
+
+.success-card p {
+    margin: 0 0 24px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--muted);
+}
+
+.success-card button {
+    width: 100%;
+    padding: 14px;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-ink);
+    background: var(--accent);
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 0.4s var(--spring), box-shadow 0.25s ease;
+}
+
+.success-card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px var(--accent-glow);
+}
+
+.success-card button:active { transform: scale(0.97); }
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pop-in {
+    from { opacity: 0; transform: scale(0.82) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.movie__btn__del {
+    height: 48px;
+    padding: 0 26px;
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    background: rgba(255, 178, 62, 0.1);
+    color: var(--accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.4s var(--spring), background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.movie__btn__del:hover {
+    background: rgba(255, 107, 107, 0.16);
+    border-color: var(--danger);
+    color: var(--danger);
+    transform: translateY(-2px);
+}
+
+.movie__btn__del:active { transform: scale(0.97); }
+
+
+/* =========================================================
+   КОНТЕЙНЕРИ ПО ШИРИНІ
+   ========================================================= */
+.page,
+.trending,
+.movies-grid,
+.movie-cart,
+.profile {
+    max-width: var(--content-width);
+    margin-inline: auto;
+}
+
+.movie-list {
+    max-width: var(--content-width);
+    margin-inline: auto;
+}
+
+.profile { max-width: 1100px; }
+
+.movies-grid,
+.movie-cart {
+    grid-template-columns: repeat(auto-fill, var(--card-width));
+    justify-content: center;
+    padding: 24px var(--gutter) 0;
+}
+
+
+/* =========================================================
+   ТАЧ-ПРИСТРОЇ
+   ========================================================= */
 @media (hover: none) and (pointer: coarse) {
     * { -webkit-tap-highlight-color: transparent; }
 
     button, a, input, .movie-block, .movie-card { touch-action: manipulation; }
 
-    /* живая реакция на нажатие вместо hover */
-    .movie-block,
-    .movie-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    body::after { animation: none; }
 
-    .movie-block:active,
-    .movie-card:active {
+    .movie-block:active {
+        transform: scale(0.97);
         box-shadow: 0 6px 18px var(--accent-glow);
     }
 
-    /* стрелки Swiper не нужны — свайпаем пальцем */
     .swiper-button-next,
     .swiper-button-prev { display: none; }
 }
 
 
-/* ---------- ≤ 768px: телефоны и небольшие планшеты ---------- */
+/* =========================================================
+   ПЛАНШЕТ / МОБІЛЬНИЙ ≤ 768
+   ========================================================= */
 @media (max-width: 768px) {
 
     :root {
         --gutter: 14px;
-        --card-width: clamp(108px, 31vw, 150px);
-        --radius-card: 12px;
+        --card-width: clamp(112px, 36vw, 156px);
+        --radius-card: 10px;
     }
 
     #root { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
 
-    /* Header */
     header {
         padding-top: calc(8px + env(safe-area-inset-top));
         padding-bottom: 8px;
     }
 
-    .header_block { min-height: 48px; }
+    .header_block { min-height: 50px; }
     .header_block nav { gap: 12px; margin-left: auto; }
 
-    .logo { height: 36px; }
-    .logo-img { width: 34px; }
+    .logo { height: 32px; }
+    .logo-img { width: 32px; }
 
     .register-img {
         width: 38px;
@@ -999,45 +1573,24 @@ header {
         padding: 2px;
     }
 
-    /* Page: у вложенных блоков свои отступы, поэтому у .page их нет */
     .page { padding: 0 0 40px; }
 
     .page__title {
-        margin: 16px 0 16px;
+        margin: 16px 0;
         padding: 0 var(--gutter);
-        font-size: 20px;
-        line-height: 1.25;
+        font-size: 32px;
+        line-height: 1.1;
     }
 
     .status { margin: 24px var(--gutter); font-size: 14px; }
 
-    /* Search на странице (не в шапке) */
-    .search {
-        max-width: none;
-        margin: 14px var(--gutter) 6px;
-        padding: 0;
-    }
+    .trending { margin-top: 28px; }
 
-    .search__input {
-        height: 48px;
-        padding: 0 16px 0 46px;
-        font-size: 16px;                 /* ≥16px — иначе iOS зумит страницу при фокусе */
-        background-position: 16px center;
-    }
-
-    .search__input:focus { box-shadow: 0 0 0 3px var(--accent-glow); }
-
-    .search__button {
-        padding: 0 22px;
-        text-transform: capitalize;
-        box-shadow: 0 4px 14px var(--accent-glow);
-    }
-
-    /* Trending */
-    .trending__header { margin-top: 20px; }
+    .trending__header { padding-bottom: 24px; }
 
     .trending__header h2,
-    .trending h2 { font-size: 22px; }
+    .trending h2,
+    .profile__favorites h2 { font-size: 46px; }
 
     .buttons {
         margin: 16px var(--gutter) 0;
@@ -1051,45 +1604,42 @@ header {
         padding: 6px 18px;
     }
 
-    /* Лента */
     .movie-list {
-        gap: 10px;
-        padding: 16px var(--gutter) 28px;
-        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
-        mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+        padding: 40px var(--gutter);
+        border-radius: 0;
     }
 
-    .movie-block { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); }
+    .movie-list::before { top: 12px; }
+    .movie-list::after { bottom: 12px; }
 
-    /* Название на постере: всегда видно, максимум 3 строки */
+    .movie-block { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55); }
+
     .movie-block p {
-        padding: 36px 9px 10px;
+        padding: 44px 10px 10px;
         font-size: 12px;
         line-height: 1.25;
     }
 
-    /* Сетка */
     .movies-grid,
     .movie-cart {
         grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
-        gap: 10px;
-        padding: 0 var(--gutter);
+        gap: 12px;
+        padding: 16px var(--gutter) 0;
     }
 
-    /* Swiper: боковые отступы задаются slidesOffsetBefore/After, поэтому padding только по вертикали */
-    .swiper { padding: 14px var(--gutter) 28px; }
     .swiper-button-next,
     .swiper-button-prev { display: none; }
 
     .loading { padding: 40px var(--gutter); }
-    .spinner { width: 36px; height: 36px; }
+    .spinner { width: 44px; height: 44px; }
 }
 
 
-/* ---------- ≤ 640px: формы, профиль, попап, поиск в шапке ---------- */
+/* =========================================================
+   МОБІЛЬНИЙ ≤ 640
+   ========================================================= */
 @media (max-width: 640px) {
 
-    /* --- Sign in / Log in --- */
     .register-page {
         flex-direction: column;
         align-items: stretch;
@@ -1102,28 +1652,20 @@ header {
     .log-in-block {
         width: 100%;
         max-width: none;
-        padding: 26px 20px 24px;
+        padding: 28px 0 24px;
         border-radius: 22px;
-        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
     .register-block h1,
     .log-in-block h1 {
-        width: 100%;
         margin: 0 0 22px;
-        font-size: 26px;
-        text-align: left;
+        font-size: 36px;
     }
-
-    .register-form { width: 100%; }
-
-    .register-form label { margin-bottom: 7px; }
 
     .register-form input {
         height: 52px;
         margin-bottom: 16px;
-        padding: 0 16px;
-        font-size: 16px;                 /* без зума iOS */
+        font-size: 16px;
     }
 
     .register-form button[type="submit"] {
@@ -1132,14 +1674,13 @@ header {
         font-size: 16px;
     }
 
-    .register-form button[type="submit"]:active {  }
-
     .form-error,
     .register-form p { margin: -4px 0 16px; line-height: 1.4; }
 
 
-    /* --- Profile: билет с отрывным корешком внизу --- */
     .profile { padding: 16px var(--gutter) 48px; }
+
+    .profile::before { top: 20px; height: 200px; }
 
     .profile__header {
         --stub-h: 76px;
@@ -1152,8 +1693,12 @@ header {
         padding: 24px 20px 0;
         text-align: left;
         border-radius: 22px;
-
-        /* вырезы по бокам на линии отрыва */
+        background:
+                linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.09) 50%, transparent 58%) 160% 0 / 260% 100% no-repeat,
+                linear-gradient(180deg, transparent calc(100% - var(--stub-h)), rgba(255, 178, 62, 0.08) calc(100% - var(--stub-h))),
+                radial-gradient(420px 220px at 0% 0%, rgba(255, 178, 62, 0.2), transparent 70%),
+                radial-gradient(380px 220px at 70% 120%, rgba(110, 168, 255, 0.14), transparent 70%),
+                var(--surface);
         -webkit-mask:
                 radial-gradient(circle var(--notch) at 0 calc(100% - var(--stub-h)), #0000 98%, #000) left / 51% 100% no-repeat,
                 radial-gradient(circle var(--notch) at 100% calc(100% - var(--stub-h)), #0000 98%, #000) right / 51% 100% no-repeat;
@@ -1162,7 +1707,8 @@ header {
                 radial-gradient(circle var(--notch) at 100% calc(100% - var(--stub-h)), #0000 98%, #000) right / 51% 100% no-repeat;
     }
 
-    /* пунктир — горизонтальный */
+    .profile__header::before { display: none; }
+
     .profile__header::after {
         top: auto;
         bottom: var(--stub-h);
@@ -1170,12 +1716,12 @@ header {
         right: var(--notch);
         height: 0;
         border-left: 0;
-        border-top: 2px dashed var(--edge);
+        border-top: 2px dashed var(--edge-strong);
     }
 
     .profile__avatar { width: 72px; height: 72px; border-width: 2px; }
 
-    .profile__name { font-size: 24px; margin-bottom: 4px; }
+    .profile__name { font-size: 34px; margin-bottom: 4px; }
     .profile__email { font-size: 14px; }
 
     .profile__logout {
@@ -1183,17 +1729,13 @@ header {
         justify-self: stretch;
         align-self: center;
         height: 46px;
+        margin-top: 0;
         padding: 0 20px;
         font-size: 15px;
     }
 
-    .profile__favorites { margin-top: 32px; }
-    .profile__favorites h2 { font-size: 20px; margin-bottom: 16px; }
-
-    .profile .movie-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-    }
+    .profile__favorites { margin-top: 40px; }
+    .profile__favorites h2 { font-size: 42px; margin-bottom: 18px; }
 
     .movie-card { border-radius: 14px; }
 
@@ -1210,14 +1752,14 @@ header {
     .movie-card p { margin: 0 12px 12px; font-size: 13px; }
 
     .movie-card button {
-        min-height: 40px;                /* нормальная зона тапа */
+        min-height: 40px;
         margin: auto 12px 12px;
     }
 
     .profile__empty { padding: 40px 16px; border-radius: 18px; font-size: 14px; }
 
 
-    /* --- Verify popup: bottom sheet, как в нативных приложениях --- */
+    /* Попап стає «шторкою» знизу */
     .verify-popup {
         align-items: flex-end;
         padding: 0;
@@ -1232,10 +1774,9 @@ header {
         max-height: 92vh;
         max-height: 92dvh;
         overflow-y: auto;
-        animation: verify-sheet 0.3s var(--ease);
+        animation: verify-sheet 0.4s var(--ease), angle 6s linear infinite;
     }
 
-    /* «ручка» сверху шторки */
     .verify-popup__card::before {
         content: "";
         display: block;
@@ -1243,38 +1784,20 @@ header {
         height: 4px;
         margin: 0 auto 18px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.2);
     }
 
-    .verify-popup__title { margin-bottom: 18px; font-size: 18px; }
+    .verify-popup__title { margin-bottom: 18px; font-size: 25px; }
     .verify-popup__email { font-size: 15px; }
 
-    .verify-popup__input {
-        height: 56px;
-        font-size: 22px;                 /* крупный код, без зума iOS */
-        letter-spacing: 0.3em;
-        border-radius: 14px;
-    }
+    .verify-popup__input { height: 58px; font-size: 22px; }
 
-    .verify-popup__button { height: 54px; font-size: 16px; border-radius: 14px; }
+    .verify-popup__button { height: 54px; font-size: 16px; }
 
     .verify-popup__error { margin-top: 12px; }
 
 
-    /* --- Складывающийся поиск в шапке (чистый CSS, без JS) ---
-       Свёрнут: круглая кнопка-лупа рядом с иконкой входа.
-       Тап по лупе → фокус → поиск раскрывается на всю ширину шапки.
-       Остаётся раскрытым, пока в поле есть текст (кнопка Submit не исчезает до тапа).
-       Нужен placeholder на input — на нём работает :placeholder-shown. */
-
-    /* обёртка вокруг формы имеет inline-стили (padding-top: 10px, column) */
-    .header_block nav > div {
-        padding-top: 0 !important;
-        flex-direction: row !important;
-        align-items: center;
-    }
-
-    /* свёрнутое состояние */
+    /* Пошук у хедері згортається в іконку-лупу */
     .header_block .search {
         width: 44px;
         height: 44px;
@@ -1285,14 +1808,14 @@ header {
 
     .header_block .search__input {
         flex: none;
-        width: 44px !important;          /* перебиваем inline width: 80% */
+        width: 44px !important;
         height: 44px;
-        margin: 0 !important;            /* перебиваем inline margin: auto */
+        margin: 0 !important;
         padding: 0;
         color: transparent;
         caret-color: transparent;
         cursor: pointer;
-        background-position: center;
+        background-position: center, 0 0, 0 0;
         -webkit-appearance: none;
         appearance: none;
     }
@@ -1300,7 +1823,6 @@ header {
     .header_block .search__input::placeholder { color: transparent; }
     .header_block .search__button { display: none; }
 
-    /* раскрытое состояние */
     .header_block .search:focus-within,
     .header_block .search:has(.search__input:not(:placeholder-shown)) {
         position: absolute;
@@ -1313,8 +1835,8 @@ header {
         gap: 8px;
         transform: translateY(-50%);
         border-radius: 999px;
-        background: var(--bg);           /* закрывает лого и иконку входа под собой */
-        animation: search-open 0.25s var(--ease);
+        background: var(--bg);
+        animation: search-open 0.35s var(--ease);
     }
 
     .header_block .search:focus-within .search__input,
@@ -1327,7 +1849,7 @@ header {
         color: var(--text);
         caret-color: var(--accent);
         cursor: text;
-        background-position: 16px center;
+        background-position: 17px center, 0 0, 0 0;
     }
 
     .header_block .search:focus-within .search__input::placeholder,
@@ -1339,53 +1861,60 @@ header {
     .header_block .search:has(.search__input:not(:placeholder-shown)) .search__button {
         display: block;
         height: 48px;
-        padding: 0 18px;
+        padding: 0 20px;
     }
 }
 
 @keyframes search-open {
     from { opacity: 0; clip-path: inset(0 0 0 75% round 999px); }
-    to   { opacity: 1; clip-path: inset(0 0 0 0 round 999px); }
+    to { opacity: 1; clip-path: inset(0 0 0 0 round 999px); }
 }
 
 
-/* ---------- ≤ 480px: обычные телефоны ---------- */
 @media (max-width: 480px) {
-    .search__button { padding: 0 18px; }
+    .search__button { padding: 0 20px; }
 }
 
 
-/* ---------- ≤ 360px: iPhone SE и старые Android ---------- */
+/* =========================================================
+   ДУЖЕ ВУЗЬКІ ≤ 360
+   ========================================================= */
 @media (max-width: 360px) {
 
     :root {
         --gutter: 12px;
-        --card-width: clamp(100px, 33vw, 120px);
+        --card-width: clamp(104px, 38vw, 124px);
     }
 
-    .logo { height: 30px; }
+    .logo { height: 28px; }
     .header_block nav { gap: 10px; }
 
-    .search__button { padding: 0 14px; font-size: 14px; }
+    .search__button { padding: 0 16px; font-size: 14px; }
 
     .movies-grid,
     .movie-cart { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
 
+    .trending__header h2,
+    .trending h2,
+    .profile__favorites h2 { font-size: 38px; }
+
     .profile__header { padding: 20px 16px 0; }
     .profile__avatar { width: 60px; height: 60px; }
-    .profile__name { font-size: 21px; }
+    .profile__name { font-size: 28px; }
 
     .register-block,
-    .log-in-block { padding: 22px 16px 20px; }
+    .log-in-block { padding: 22px 0 20px; }
 
     .register-block h1,
-    .log-in-block h1 { font-size: 23px; }
+    .log-in-block h1 { font-size: 31px; }
 
     .movie-card h3 { font-size: 13px; }
 }
 
 
-/* ---------- Альбомная ориентация телефона ---------- */
+/* =========================================================
+   ЛАНДШАФТ НА ТЕЛЕФОНІ
+   ========================================================= */
 @media (max-height: 480px) and (orientation: landscape) {
     header { position: static; }
 
@@ -1395,182 +1924,50 @@ header {
         max-width: 420px;
         margin: auto;
         max-height: 100dvh;
-        border-radius: 20px;
-        animation: verify-rise 0.25s ease-out;
+        border-radius: 22px;
+        border-bottom: 1px solid transparent;
+        animation: verify-rise 0.4s var(--spring), angle 6s linear infinite;
     }
 
     .verify-popup__card::before { display: none; }
 }
 
 
-/* ============ 12. Reduced motion ============ */
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
 
     *,
     *::before,
     *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
+        animation: none !important;
         transition-duration: 0.01ms !important;
     }
 
-    /* спиннер должен продолжать крутиться, иначе загрузка выглядит зависшей */
-    .spinner { animation-duration: 1.6s !important; animation-iteration-count: infinite !important; }
-}
-.movies-grid,
-.movie-cart {
-    grid-template-columns: repeat(auto-fill, var(--card-width));
-    justify-content: center;
-}
-:root { --content-width: 1350px; }
-
-.page,
-.trending,
-.movie-list,
-.swiper,
-.movies-grid,
-.movie-cart,
-.profile {
-    max-width: var(--content-width);
-    margin-inline: auto;
-}
-.trending, .movie-cart{
-    padding-top: 20px;
+    .spinner { animation: spin 1.6s linear infinite !important; }
 }
 
-.buttons-verify{
-    display: flex;
-    justify-content: space-between;
-}
-.buttons-verify button{
-    width: 48%;
-}
-.cancel-popup__button{
-    background-color: grey;
-    color: white;
-}
-.cancel-popup__button{
+/* ===== FIX: афиша не обрезается при hover ===== */
 
+/* Swiper режет только по горизонтали (для слайдов),
+   а по вертикали даёт карточке свободно подняться */
+.swiper {
+    overflow-x: clip!important;
+    overflow-y: visible!important;
 }
 
-/* Оверлей: затемнение + центр */
-.register-cart {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--gutter);
-    background: var(--glass);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    animation: fade-in 0.25s var(--ease);
+/* Лента не обрезает карточку и её свечение сверху и снизу */
+.movie-list {
+    overflow-x: clip!important;
+    overflow-y: visible!important;
 }
 
-/* Карточка */
-.success-card {
-    width: 100%;
-    max-width: 380px;
-    padding: 32px 24px;
-    text-align: center;
-    color: var(--text);
-    background: var(--surface);
-    border: 1px solid var(--edge-strong);
-    border-radius: var(--radius-card);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55),
-    0 0 40px var(--accent-glow);
-    animation: pop-in 0.35s var(--ease);
-}
-
-/* Иконка-галочка */
-.success-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    font-weight: 700;
-    color: var(--accent-ink);
-    background: var(--accent);
-    border-radius: 50%;
-    box-shadow: 0 0 24px var(--accent-glow);
-}
-
-.success-card h1 {
-    margin: 0 0 8px;
-    font-size: 22px;
-    color: var(--text);
-}
-
-.success-card p {
-    margin: 0 0 24px;
-    font-size: 15px;
-    line-height: 1.5;
-    color: var(--muted);
-}
-
-/* Кнопка */
-.success-card button {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--accent-ink);
-    background: var(--accent);
-    border: 0;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
-}
-
-.success-card button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px var(--accent-glow);
-}
-
-.success-card button:active {
-    transform: translateY(0);
-}
-
-/* Анимации */
-@keyframes fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
-@keyframes pop-in {
-    from {
-        opacity: 0;
-        transform: scale(0.92)
+/* Запасной вариант для старых браузеров без overflow: clip */
+@supports not (overflow: clip) {
+    .swiper {
+        padding-block: 44px;
+        margin-block: -30px;
     }
-}
-.movie__btn__del {
-    height: 48px;
-    padding: 0 26px;
-    border: 1px solid var(--accent);
-    border-radius: 12px;
-    background: rgba(255, 122, 61, 0.12);
-    color: var(--accent);
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.25s var(--ease),
-    background 0.25s var(--ease),
-    color 0.25s var(--ease),
-    border-color 0.25s var(--ease);
-}
-
-.movie__btn__del:hover {
-    background: rgba(255, 107, 107, 0.14);
-    border-color: var(--danger);
-    color: var(--danger);
-    transform: translateY(-1px);
-}
-
-.movie__btn__del:active {
-    transform: translateY(0);
 }

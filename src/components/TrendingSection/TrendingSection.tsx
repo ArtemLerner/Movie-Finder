@@ -37,12 +37,12 @@ export default function TrendingSection({ mediaType }: Props) {
     return (
         <div className='trending'>
             <div className="trending__header">
+
+                <h2>Trending {`${mediaType}`}</h2>
                 <MovieSwitchers
                     buttons={buttonsTrending}
                     time={setTimeWindow}
                 />
-                <h2>Trending {`${mediaType}`}</h2>
-
             </div>
             {
                 loading

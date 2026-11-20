@@ -1,4 +1,5 @@
 import TrendingSection from "../../components/TrendingSection/TrendingSection.tsx";
+import AllMovies from "../../components/AllMovies/AllMovies.tsx";
 
 export default function HomePage() {
 
@@ -9,6 +10,8 @@ export default function HomePage() {
         <div>
             <TrendingSection  mediaType='movie'/>
             <TrendingSection  mediaType='tv'/>
+            <AllMovies mediaType='movie'/>
+            <AllMovies mediaType='tv'/>
         </div>
     )
 }
