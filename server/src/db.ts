@@ -3,9 +3,7 @@ import "dotenv/config";
 
 export const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: true,
-    },
+    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: true } : false,
 });
 
 export async function cleanupPending() {
