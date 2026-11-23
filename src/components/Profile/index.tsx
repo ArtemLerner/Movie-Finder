@@ -1,32 +1,28 @@
 import {useAuth} from "../../context/AuthContext.tsx";
 import {useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import Loading from "../Loading/Loading.tsx";
 import MovieCart from "../MovieCart/MovieCart.tsx";
-import type {MovieDetailsType} from "../../share/types/MovieCart.ts";
+import {useFavorites} from "../../hooks/useFavorites.ts";
+
+const userImg = '/profile.svg';
+const VITE_URL = import.meta.env.VITE_URL;
+
 
 export default function Profile() {
     const {user, setUser} = useAuth();
+    const { data: favorites = [], isLoading  } = useFavorites();
     const nav = useNavigate();
-
-    const [favorites, setFavorites] = useState<MovieDetailsType[]>([]);
-
-    const [loading, setLoading] = useState(false);
-
-
-    const VITE_URL = import.meta.env.VITE_URL;
 
     useEffect(() => {
         if(!user) nav('/register');
     });
 
-    const userImg = '/profile.svg';
 
     async function handleLogOut(){
         if(!user) return;
 
         try{
-            setLoading(true);
             await fetch(`${VITE_URL}/auth/logout`, {
                 method: "POST",
                 credentials: "include",
@@ -34,41 +30,13 @@ export default function Profile() {
         } finally {
             setUser(null);
             nav('/register');
-            setLoading(false);
         }
     }
-
-    useEffect(()=>{
-        if(!user) return;
-
-        async function handleLogout(){
-            if(!user) return;
-
-            try{
-                setLoading(true);
-                const res = await fetch(`${VITE_URL}/api/favorites`,{
-                    credentials: "include",
-                })
-                const data = await res.json();
-
-                if(res.ok){
-                    setFavorites(data.movies);
-                    setLoading(false);
-                }else{
-                    console.log(data.error);
-                }
-            }catch (error) {
-                console.log(error);
-            }
-
-        }
-        void handleLogout();
-    },[user])
 
     return (
         <main className="profile">
             {
-                loading ? <Loading/> :
+                isLoading ? <Loading/> :
                     <>
                         <section className="profile__header">
                             <img className="profile__avatar" src={userImg} alt="User avatar"/>
@@ -91,7 +59,6 @@ export default function Profile() {
                                     )}
                                 </div>
                                 </ul>
-
                                 :
                             <p className="profile__empty">You have no favorite movies yet.</p>
                             }

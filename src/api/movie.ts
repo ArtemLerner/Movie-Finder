@@ -33,6 +33,23 @@ export async function AllMoviesApi(MediaType: MediaType){
         console.error(error);
     }
 }
+export async function getAllFavorites(){
+
+    try{
+        const res = await fetch(`${BASE_URL}favorites`,{
+            credentials: "include",
+        })
+        const data = await res.json();
+
+        if(res.ok){
+            return data.movies;
+        }else{
+            console.log(data.error);
+        }
+    }catch (error) {
+        console.log(error);
+    }
+}
 
 export async function SearchMovies(query: string){
 
