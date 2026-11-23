@@ -1,28 +1,18 @@
-import {AllMoviesApi, type MediaType} from "../../api/movie.ts";
-import {useEffect, useState} from "react";
+import {type MediaType} from "../../api/movie.ts";
 import MovieCart from "../../components/MovieCart/MovieCart.tsx";
-import type {MovieCartType} from "../../share/types/MovieCart.ts";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Autoplay, Navigation} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import Loading from "../Loading/Loading.tsx";
-import type SwiperType from "swiper"
+import {useMedia} from "../../hooks/useMedia.ts";
 
 interface Props {
     mediaType: MediaType;
 }
 
 export default function AllMovies({mediaType}: Props) {
-    const [movies, setMovies] = useState<MovieCartType[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
-
-    useEffect(() => {
-        AllMoviesApi(mediaType)
-            .then(movies => setMovies(movies ?? []))
-            .finally(() => setLoading(false));
-    },[mediaType]);
+    const { data: movies = [], isLoading, isError } = useMedia(mediaType)
 
     return (
         <div className='trending'>
@@ -30,10 +20,11 @@ export default function AllMovies({mediaType}: Props) {
                 <h2>All {mediaType}</h2>
             </div>
             {
-                loading
+                isLoading
                     ?
                     <Loading/>
                     :
+                    isError ? <p>Eror</p> :
                     <div className="movie-list">
                         <Swiper
                             modules={[Navigation, Autoplay]}
@@ -47,11 +38,10 @@ export default function AllMovies({mediaType}: Props) {
                             navigation
                             spaceBetween={16}
                             slidesPerView="auto"
-                            onSwiper={setSwiperInstance}
                         >
                             {movies.map(movie => (
                                 <SwiperSlide key={movie.id}>
-                                    <MovieCart swiper={swiperInstance} data={movie} />
+                                    <MovieCart data={movie} />
                                 </SwiperSlide>
                             ))}
                         </Swiper>

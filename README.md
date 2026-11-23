@@ -7,6 +7,7 @@
 - [x] User profile page
 - [x] Show favorite movies in the profile
 - [x] Add more content to the home page
-- [ ] zod
+- [x] zod server
+- [ ] tanStack
 - [ ] Write tests
 - [ ] Deploy and final polish

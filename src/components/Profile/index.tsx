@@ -3,9 +3,6 @@ import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Loading from "../Loading/Loading.tsx";
 import MovieCart from "../MovieCart/MovieCart.tsx";
-import {Autoplay, Navigation} from "swiper/modules";
-import {Swiper, SwiperSlide} from "swiper/react";
-import type SwiperType from "swiper";
 import type {MovieDetailsType} from "../../share/types/MovieCart.ts";
 
 export default function Profile() {
@@ -15,7 +12,6 @@ export default function Profile() {
     const [favorites, setFavorites] = useState<MovieDetailsType[]>([]);
 
     const [loading, setLoading] = useState(false);
-    const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
 
 
     const VITE_URL = import.meta.env.VITE_URL;
@@ -88,29 +84,15 @@ export default function Profile() {
                         <section className="profile__favorites">
                             <h2>Favorite movies</h2>
                             {favorites  ?
-                            <ul className="movie-list">
-                                <Swiper
-                                    modules={[Navigation, Autoplay]}
-                                    loop={favorites.length > 8}
-                                    loopAdditionalSlides={6}
-                                    autoplay={{
-                                        delay: 2500,
-                                        disableOnInteraction: false,
-                                        pauseOnMouseEnter: true,
-                                    }}
-                                    navigation
-                                    spaceBetween={16}
-                                    slidesPerView="auto"
-                                    onSwiper={setSwiperInstance}
-                                >
+                                <ul className="movie-list " >
+                                <div className="movies-grid">
                                     {favorites.map(movie =>
-                                        <SwiperSlide key={movie.id}>
-                                            <MovieCart key={movie.id} swiper={swiperInstance} data={movie}/>
-                                        </SwiperSlide>
+                                        <MovieCart key={movie.id} data={movie}/>
                                     )}
-                                </Swiper>
-                            </ul>
-                            :
+                                </div>
+                                </ul>
+
+                                :
                             <p className="profile__empty">You have no favorite movies yet.</p>
                             }
                         </section>
