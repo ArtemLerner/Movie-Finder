@@ -20,35 +20,21 @@ export async function Movie(mediaType: MediaType, timeWindow: timeWindow){
 }
 
 export async function AllMoviesApi(MediaType: MediaType){
-    try{
         const response = await fetch(
             `${BASE_URL}all/${MediaType}`, {
                 headers: { Authorization: `Bearer ${TMDB_TOKENT}` },
             });
-
         const data = await response.json();
-
         return data.results;
-    }catch (error){
-        console.error(error);
-    }
 }
 export async function getAllFavorites(){
-
-    try{
         const res = await fetch(`${BASE_URL}favorites`,{
             credentials: "include",
         })
         const data = await res.json();
+        if(res.ok)
+            return data.movies
 
-        if(res.ok){
-            return data.movies;
-        }else{
-            console.log(data.error);
-        }
-    }catch (error) {
-        console.log(error);
-    }
 }
 
 export async function SearchMovies(query: string){

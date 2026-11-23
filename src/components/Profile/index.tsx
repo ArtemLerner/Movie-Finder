@@ -31,6 +31,7 @@ export default function Profile() {
             setUser(null);
             nav('/register');
         }
+        setUser(null);
     }
 
     return (

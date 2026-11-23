@@ -4,6 +4,7 @@ import {useAuth} from "../../context/AuthContext.tsx";
 import Loading from "../Loading/Loading.tsx";
 import SignInPopup from "../Popup/sign-in.popup.tsx";
 import type {User} from "../../share/types/User.ts";
+import {signIn} from "../../api/auth.ts";
 
 export default function SignIn() {
 
@@ -62,24 +63,16 @@ export default function SignIn() {
             return;
         }
 
-        try {
-            setLoadingReg(true);
-            const res = await fetch(`${SERVER_URL}/auth/register`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({email: regEmail, password: regPassword})
-            }).finally(()=>setLoadingReg(false))
+        setLoadingReg(true);
+        const data = await signIn(regEmail, regPassword)
+            .finally(()=>setLoadingReg(false))
 
-            const data = await res.json();
-            if (res.ok) {
-                setPopup(true);
-            }else {
-                setRegError(data.error || data.message || 'Email already exists');
-            }
-        }catch(err) {
-            console.log(err);
+        if(data){
+            setPopup(true);
+        }else {
+            setRegError(data.error || data.message || 'Email already exists');
         }
+
     }
 
     async function handleLoginSubmit(e: React.FormEvent) {

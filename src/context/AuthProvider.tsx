@@ -4,16 +4,16 @@ import type { User } from "../share/types/User";
 import { AuthContext } from "./AuthContext";
 import {checkMe} from "../api/auth.ts";
 
-
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
 
 
     useEffect(() => {
+
         (async () => {
            try {
-                await checkMe(setUser);
+               setUser(await checkMe());
             } catch {
                 setUser(null);
             } finally {
