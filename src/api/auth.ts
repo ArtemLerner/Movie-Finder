@@ -25,3 +25,26 @@ export async function signIn(regEmail: string, regPassword: string){
         console.log(err);
     }
 }
+
+export async function logIn(loginEmail: string, loginPassword: string){
+    try {
+        const res = await fetch(`${BASE_URL}login`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+
+            return data
+        } else {
+            return (data.error || data.message || 'Email already exists');
+        }
+
+    } catch (err) {
+        return ("Не удалось связаться с сервером."+ err);
+    }
+}

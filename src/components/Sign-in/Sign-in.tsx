@@ -4,7 +4,7 @@ import {useAuth} from "../../context/AuthContext.tsx";
 import Loading from "../Loading/Loading.tsx";
 import SignInPopup from "../Popup/sign-in.popup.tsx";
 import type {User} from "../../share/types/User.ts";
-import {signIn} from "../../api/auth.ts";
+import {logIn, signIn} from "../../api/auth.ts";
 
 export default function SignIn() {
 
@@ -77,34 +77,19 @@ export default function SignIn() {
 
     async function handleLoginSubmit(e: React.FormEvent) {
         e.preventDefault();
-
-
         setLoginError("");
-
-        try {
-            setLoadingLog(true);
-            const res = await fetch(`${SERVER_URL}/auth/login`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-            }).finally(()=>setLoadingLog(false));
-
-            const data = await res.json();
-
-
-            if (res.ok) {
-                setUser(data);
-                nav("/profile");
-            } else {
-                setPopup(false);
-                setLoginError(data.error || data.message || 'Email already exists');
-            }
-
-        } catch (err) {
-            setPopup(false);
-            setLoginError("Не удалось связаться с сервером.");
-        }
+        await logIn(loginEmail, loginPassword)
+            .then((data) => {
+                if(data){
+                    setUser(data)
+                    nav("/profile");
+                }else{
+                    setPopup(false);
+                    setLoginError("Failed to login");
+                }
+            })
+            .catch(() => setLoginError("Incorrect login or password"))
+            .finally(() => setLoadingLog(false))
     }
 
     async function handleToken (token: string): Promise<boolean> {
