@@ -5,10 +5,14 @@ import Loading from "../Loading/Loading.tsx";
 import SignInPopup from "../Popup/sign-in.popup.tsx";
 import type {User} from "../../share/types/User.ts";
 import {logIn, signIn, verify} from "../../api/auth.ts";
+import {useQueryClient} from "@tanstack/react-query";
+
 
 export default function SignIn() {
     const {user,setUser} = useAuth();
     const nav = useNavigate();
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if(user){
@@ -74,7 +78,7 @@ export default function SignIn() {
     async function handleLoginSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoginError("");
-
+        queryClient.clear();
         await logIn(loginEmail, loginPassword)
             .then((data) => {
                 if(data){
