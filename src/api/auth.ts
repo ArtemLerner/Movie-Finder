@@ -48,3 +48,26 @@ export async function logIn(loginEmail: string, loginPassword: string){
         return ("Не удалось связаться с сервером."+ err);
     }
 }
+
+export async function verify(regEmail:string, token:string){
+    try{
+        const res = await fetch(`${BASE_URL}verify-e`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({email: regEmail, token})
+        })
+
+        const data = await res.json();
+
+        if (res.ok) {
+
+            return data
+        }else{
+            return false;
+        }
+    }catch(err) {
+        console.log(err);
+        return false;
+    }
+}
