@@ -4,15 +4,15 @@ import {useAuth} from "../../context/AuthContext.tsx";
 import Loading from "../Loading/Loading.tsx";
 import SignInPopup from "../Popup/sign-in.popup.tsx";
 import type {User} from "../../share/types/User.ts";
-import {signIn} from "../../api/auth.ts";
+import {logIn, signIn, verify} from "../../api/auth.ts";
+import {useQueryClient} from "@tanstack/react-query";
+
 
 export default function SignIn() {
-
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-
-    // Состояния для формы регистрации
     const {user,setUser} = useAuth();
     const nav = useNavigate();
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if(user){
@@ -34,7 +34,6 @@ export default function SignIn() {
 
     const [loadingReg, setLoadingReg] = useState(false);
     const [loadingLog, setLoadingLog] = useState(false);
-    const [loadingPop, setLoadingPop] = useState(false);
 
     const [toast, setToast] = useState(false);
 
@@ -64,6 +63,7 @@ export default function SignIn() {
         }
 
         setLoadingReg(true);
+
         const data = await signIn(regEmail, regPassword)
             .finally(()=>setLoadingReg(false))
 
@@ -77,70 +77,39 @@ export default function SignIn() {
 
     async function handleLoginSubmit(e: React.FormEvent) {
         e.preventDefault();
-
-
         setLoginError("");
-
-        try {
-            setLoadingLog(true);
-            const res = await fetch(`${SERVER_URL}/auth/login`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-            }).finally(()=>setLoadingLog(false));
-
-            const data = await res.json();
-
-
-            if (res.ok) {
-                setUser(data);
-                nav("/profile");
-            } else {
-                setPopup(false);
-                setLoginError(data.error || data.message || 'Email already exists');
-            }
-
-        } catch (err) {
-            setPopup(false);
-            setLoginError("Не удалось связаться с сервером.");
-        }
+        queryClient.clear();
+        await logIn(loginEmail, loginPassword)
+            .then((data) => {
+                if(data){
+                    setUser(data)
+                    nav("/profile");
+                }else{
+                    setPopup(false);
+                    setLoginError("Failed to login");
+                }
+            })
+            .catch(() => setLoginError("Incorrect login or password"))
+            .finally(() => setLoadingLog(false))
     }
 
     async function handleToken (token: string): Promise<boolean> {
-        try{
-            setLoadingPop(true);
-            const res = await fetch(`${SERVER_URL}/auth/verify-e`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({email: regEmail, token})
-            }).finally(()=>setLoadingPop(false))
 
-            const data = await res.json();
+        const isVerify = await verify(regEmail,token)
 
-            if (res.ok) {
-                setPopup(false);
-                setToast(true);
-                setRegEmail('')
-                setRegPassword('')
-                setRegConfirmPassword('')
-
-                return true
-            }else{
-                console.log(data.message);
-                setPopup(false);
-                return false;
-            }
-        }catch(err) {
-            console.log(err);
-            setLoadingPop(false);
-            return false;
+        if(isVerify){
+            setPopup(false);
+            setToast(true);
+            setRegEmail('')
+            setRegPassword('')
+            setRegConfirmPassword('')
+            return true
+        }else{
+            console.log(isVerify.message);
+            setPopup(false);
+            return false
         }
-
     }
-
-
 
 
     return (
@@ -183,7 +152,7 @@ export default function SignIn() {
                 }
                 {
 
-                    popup && !loadingPop &&
+                    popup &&
                     <SignInPopup user={{ email: regEmail } as User} verify={handleToken}/>
 
                 }
